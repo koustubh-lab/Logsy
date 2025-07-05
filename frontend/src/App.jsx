@@ -1,8 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { AuthContextProvider } from "./context/AuthContext"
 import HomePage from "./pages/HomePage"
+import InvalidRoutePage from "./pages/InvalidRoutePage"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
-import InvalidRoutePage from "./pages/InvalidRoutePage"
+import DashboardPage from "./pages/DashboardPage"
 
 function App() {
   const router = createBrowserRouter([
@@ -19,11 +21,19 @@ function App() {
       element: <RegisterPage />,
     },
     {
+      path: "/dashboard",
+      element: <DashboardPage />,
+    },
+    {
       path: "*",
       element: <InvalidRoutePage />,
     },
   ])
-  return <RouterProvider router={router} />
+  return (
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
+  )
 }
 
 export default App

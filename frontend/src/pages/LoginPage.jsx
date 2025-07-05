@@ -9,13 +9,44 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import useAuth from "@/context/AuthContext"
+import { motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { toast } from "sonner"
+
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4 },
+  },
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState({ email: "", password: "" })
+  const inputRef = useRef(null)
+
+  const navigate = useNavigate()
+  const { login } = useAuth()
 
   const validateForm = () => {
     const newErrors = { email: "", password: "" }
@@ -41,40 +72,68 @@ export default function LoginPage() {
     return isValid
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (validateForm()) {
-      // Handle login logic here
-      console.log("Login submitted", { email, password })
+    if (!validateForm()) {
+      return
+    }
+
+    try {
+      const status = await login(email, password)
+      if (status === 200) {
+        toast.success("Logged-in Successfully")
+        setTimeout(() => {
+          navigate("/dashboard")
+        }, 1000)
+      }
+    } catch (error) {
+      toast.error(error.message)
     }
   }
 
+  useEffect(() => {
+    inputRef.current.focus()
+  }, [])
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 p-4">
-      <div className="max-w-md mx-auto">
-        <Card className="border-none shadow-md">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 p-4 appear-animation">
+      <motion.div
+        className="max-w-md mx-auto w-full"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        <Card className="border-none shadow-2xl backdrop-blur-sm">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Login</CardTitle>
-            <CardDescription>
-              Enter your email and password to login to your account
-            </CardDescription>
+            <motion.div variants={itemVariants}>
+              <CardTitle className="text-3xl font-bold text-center">
+                Login
+              </CardTitle>
+              <CardDescription className="text-center">
+                Enter your email and password to login to your account
+              </CardDescription>
+            </motion.div>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              <motion.div variants={itemVariants} className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
+                  ref={inputRef}
                   placeholder="name@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setErrors((prev) => ({ ...prev, ["email"]: "" }))
+                  }}
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">{errors.email}</p>
                 )}
-              </div>
-              <div className="space-y-2">
+              </motion.div>
+              <motion.div variants={itemVariants} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
                   <Link
@@ -88,27 +147,35 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    setErrors((prev) => ({ ...prev, ["password"]: "" }))
+                  }}
                 />
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password}</p>
                 )}
-              </div>
+              </motion.div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-              <div className="text-center text-sm">
+              <motion.div variants={itemVariants}>
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+              </motion.div>
+              <motion.div
+                variants={itemVariants}
+                className="text-center text-sm"
+              >
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-primary hover:underline">
+                <Link to="/register" className="text-blue-600 hover:underline">
                   Sign up
                 </Link>
-              </div>
+              </motion.div>
             </CardFooter>
           </form>
         </Card>
-      </div>
+      </motion.div>
     </div>
   )
 }

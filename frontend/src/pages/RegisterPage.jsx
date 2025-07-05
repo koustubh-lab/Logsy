@@ -1,4 +1,3 @@
-import { registerUserApi } from "@/api/AuthApiService"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -10,14 +9,43 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import useAuth from "@/context/AuthContext"
+import { motion } from "framer-motion"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.95, filter: "blur(4px)" },
+  show: {
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      type: "spring",
+      stiffness: 80,
+      damping: 15,
+      duration: 0.7,
+      when: "beforeChildren",
+      staggerChildren: 0.12,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+}
 
 export default function RegisterPage() {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const { register } = useAuth()
 
   const [formData, setFormData] = useState({
     username: "",
@@ -30,9 +58,13 @@ export default function RegisterPage() {
 
   const validateInputs = () => {
     const errors = {}
-
-    if (!formData.username || formData.username.length < 6)
-      errors.username = "Username must be at least 6 characters"
+    if (
+      !formData.username ||
+      formData.username.length < 6 ||
+      formData.username.match(/$[a-z A-Z]^/)
+    )
+      errors.username =
+        "Username must be at least 6 characters and can contain only letters"
 
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email))
       errors.email = "Please enter a valid email"
@@ -48,11 +80,23 @@ export default function RegisterPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const condition = name === "username"
+    let newValue
+
+    if (condition) {
+      newValue = value
+        .split(" ")
+        .map((word) =>
+          word.substring(0, 1).toUpperCase().concat(word.substring(1))
+        )
+        .join(" ")
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: condition ? newValue : value }))
     setFormErrors((prev) => ({ ...prev, [name]: "" }))
   }
 
-  async function handleFormSubmit(e) {
+  const handleFormSubmit = async (e) => {
     e.preventDefault()
     const errors = validateInputs()
     if (Object.keys(errors).length > 0) {
@@ -62,17 +106,17 @@ export default function RegisterPage() {
 
     setIsLoading(true)
     try {
-      const {username, password, email} = formData
-      const response = await registerUserApi({username, password, email})
+      const { username, password, email } = formData
+      const response = await register({ username, password, email })
       if (response.status === 200) {
-        toast.success("Account Created !!!", {
+        toast.success("Account Created 🎉", {
           action: {
-            label: "Go to login",
+            label: "Login",
             onClick: () => navigate("/login"),
           },
         })
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong!")
     } finally {
       setIsLoading(false)
@@ -80,126 +124,142 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 grid place-content-center">
-      <div className="max-w-md mx-auto">
-        <Card className="border-none shadow-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create Account</CardTitle>
-            <CardDescription>Join our community of developers</CardDescription>
+    <div className="min-h-screen bg-gradient-to-br from-muted/40 via-white to-muted/50 grid place-content-center px-4">
+      <motion.div
+        className="max-w-md w-full"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        <Card className="border-none shadow-2xl backdrop-blur-sm">
+          <CardHeader className="text-center space-y-1">
+            <motion.div variants={itemVariants}>
+              <CardTitle className="text-3xl font-bold tracking-tight">
+                Create Account
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Join our community of developers
+              </CardDescription>
+            </motion.div>
           </CardHeader>
-          <CardContent>
-            <form className="space-y-4" onSubmit={handleFormSubmit}>
-              <div>
-                <Label htmlFor="name">User Name</Label>
-                <Input
-                  id="name"
-                  name="username"
-                  type="text"
-                  placeholder="John Doe"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors?.username && (
-                  <p className="text-red-500 text-sm pl-2">
-                    {formErrors.username}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="your@email.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors?.email && (
-                  <p className="text-red-500 text-sm pl-2">
-                    {formErrors.email}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  name="password"
-                  placeholder="Create a strong password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors?.password && (
-                  <p className="text-red-500 text-sm pl-2">
-                    {formErrors.password}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors?.confirmPassword && (
-                  <p className="text-red-500 text-sm pl-2">
-                    {formErrors.confirmPassword}
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
+
+          <CardContent className="space-y-4">
+            <form className="space-y-5" onSubmit={handleFormSubmit}>
+              {[
+                {
+                  id: "name",
+                  name: "username",
+                  type: "text",
+                  label: "Display Name",
+                  placeholder: "John Doe",
+                },
+                {
+                  id: "email",
+                  name: "email",
+                  type: "email",
+                  label: "Email",
+                  placeholder: "your@email.com",
+                },
+                {
+                  id: "password",
+                  name: "password",
+                  type: "password",
+                  label: "Password",
+                  placeholder: "Create a strong password",
+                },
+                {
+                  id: "confirmPassword",
+                  name: "confirmPassword",
+                  type: "password",
+                  label: "Confirm Password",
+                  placeholder: "Repeat password",
+                },
+              ].map((field) => (
+                <motion.div variants={itemVariants} key={field.id}>
+                  <Label htmlFor={field.id}>{field.label}</Label>
+                  <Input
+                    id={field.id}
+                    name={field.name}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={formData[field.name]}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {formErrors?.[field.name] && (
+                    <p className="text-sm text-destructive pl-1">
+                      {formErrors[field.name]}
+                    </p>
+                  )}
+                </motion.div>
+              ))}
+
+              <motion.div
+                variants={itemVariants}
+                className="flex items-center space-x-2"
+              >
                 <Checkbox
                   id="terms"
                   required
-                  value={termsAccepted}
-                  onCheckedChange={(checked) => setTermsAccepted(checked)}
+                  checked={termsAccepted}
+                  onCheckedChange={setTermsAccepted}
                 />
-                <Label htmlFor="terms" className="text-sm">
+                <Label htmlFor="terms" className="text-sm leading-snug">
                   I agree to the{" "}
-                  <Link href="/terms" className="text-blue-600 hover:underline">
+                  <Link to="/terms" className="text-blue-600 underline">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link
-                    href="/privacy"
-                    className="text-blue-600 hover:underline"
-                  >
+                  <Link to="/privacy" className="text-blue-600 underline">
                     Privacy Policy
                   </Link>
                 </Label>
-              </div>
-              <Button
-                type="submit"
-                className={`w-full ${
-                  (!termsAccepted || isLoading) &&
-                  "opacity-50 pointer-events-none"
-                }`}
-              >
-                {isLoading ? "Processing" : "Create Account"}
-              </Button>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={!termsAccepted || isLoading}
+                  >
+                    {isLoading ? "Processing..." : "Create Account"}
+                  </Button>
+                </motion.div>
+              </motion.div>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link href="/login" className="text-blue-600 hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </div>
+            <motion.div
+              variants={itemVariants}
+              className="text-center pt-4 text-sm text-gray-600"
+            >
+              Already have an account?{" "}
+              <Link to="/login" className="text-blue-600 underline">
+                Sign in
+              </Link>
+            </motion.div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   )
 }
+
+/* const { name, value } = e.target
+    const condition = name === "username"
+    let newValue
+
+    if (condition) {
+      newValue = value
+        .split(" ")
+        .map((word) =>
+          word.substring(0, 1).toUpperCase().concat(word.substring(1))
+        )
+        .join(" ")
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: condition ? newValue : value }))
+    setFormErrors((prev) => ({ ...prev, [name]: "" })) */

@@ -9,9 +9,9 @@ import {
 
 export function Navigation() {
   return (
-    <nav className="absolute top-0 bg-white/10 backdrop-blur-md w-full">
+    <nav className="absolute top-0 backdrop-blur-md w-full">
       <div className="mx-auto px-4">
-        <div className="flex items-center justify-between h-16 px-10">
+        <div className="flex items-center justify-between h-16 sm:px-10">
           <Link to="/" className="text-2xl text-gray-900 font-semibold">
             <h2>Logsy</h2>
           </Link>
@@ -30,7 +30,11 @@ export function Navigation() {
           {/* Mobile menu button */}
           <div className="md:hidden">
             <DropdownMenu>
-              <DropdownMenuTrigger>Menu</DropdownMenuTrigger>
+              <DropdownMenuTrigger>
+                <div className="p-3 py-2 shadow-md bg-white rounded-lg bg-muted">
+                  Menu
+                </div>
+              </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem>
                   <Link to="/login">Login</Link>
