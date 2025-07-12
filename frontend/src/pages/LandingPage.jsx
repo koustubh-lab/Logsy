@@ -76,43 +76,73 @@ const blogPosts = [
   },
 ]
 
-export default function HomePage() {
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="border-b min-h-screen flex justify-center items-center bg-gradient-to-br from-slate-100 via-slate-200 to-white">
+      <motion.section
+        className="border-b min-h-screen flex justify-center items-center bg-gradient-to-br from-slate-100 via-slate-200 to-white"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: {
+              staggerChildren: 0.2,
+              delayChildren: 0.2,
+            },
+          },
+        }}
+      >
         <motion.div
           className="container mx-auto grid justify-items-center max-w-[80%]"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          variants={{
+            hidden: { opacity: 0, y: 50 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.8, ease: [0.25, 0.8, 0.25, 1] },
+            },
+          }}
         >
           <motion.h1
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 text-center grid"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+              },
+            }}
           >
             <span className="whitespace-nowrap">Built For Bloggers And</span>{" "}
             <span>Loved By Thinkers.</span>
           </motion.h1>
+
           <motion.p
             className="text-sm sm:text-base md:text-xl text-gray-600 mb-8 max-w-4xl text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.6, ease: "easeOut" },
+              },
+            }}
           >
             Discover the latest insights, tutorials, and best practices in web
             development. Join our community of developers and stay ahead of the
             curve.
           </motion.p>
+
           <motion.div
             className="flex gap-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { duration: 0.5 } },
+            }}
           >
             <Button size="lg" asChild>
               <Link to={"/register"}>Get Started For Free</Link>
@@ -122,7 +152,7 @@ export default function HomePage() {
             </Button>
           </motion.div>
         </motion.div>
-      </section>
+      </motion.section>
 
       {/* Blog Posts Section */}
       <section className="container mx-auto px-4 pt-12">
@@ -132,9 +162,7 @@ export default function HomePage() {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-        >
-          Latest Posts
-        </motion.h2>
+        ></motion.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {blogPosts.map((post, index) => (

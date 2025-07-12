@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -22,12 +23,18 @@ public class Post {
     private Integer id;
 
     private String title;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
     private LocalDateTime createdAt;
 
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
 }

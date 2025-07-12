@@ -5,20 +5,26 @@ import lombok.*;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Entity
-@Table(name = "likes")
-public class Like {
+@Table(name = "profiles")
+public class Profile {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private String bio;
+    private String location;
+
+    @Lob
+    @Column(length = 100000)
+    private String profilePicture;
 
     @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
 }

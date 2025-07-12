@@ -83,7 +83,7 @@ export default function LoginPage() {
       if (status === 200) {
         toast.success("Logged-in Successfully")
         setTimeout(() => {
-          navigate("/dashboard")
+          navigate("/home/dashboard")
         }, 1000)
       }
     } catch (error) {
@@ -136,12 +136,6 @@ export default function LoginPage() {
               <motion.div variants={itemVariants} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="#"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
                 </div>
                 <Input
                   id="password"
@@ -158,7 +152,7 @@ export default function LoginPage() {
               </motion.div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="w-full">
                 <Button type="submit" className="w-full">
                   Login
                 </Button>

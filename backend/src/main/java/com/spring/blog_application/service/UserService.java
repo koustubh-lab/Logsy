@@ -1,5 +1,7 @@
 package com.spring.blog_application.service;
 
+import com.spring.blog_application.model.Post;
+import com.spring.blog_application.model.Profile;
 import com.spring.blog_application.model.User;
 import com.spring.blog_application.repository.UserRepository;
 import com.spring.blog_application.utils.RegisterRequest;
@@ -8,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 @Slf4j
 @Service
@@ -20,7 +23,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public boolean registerUser(RegisterRequest request) {
+    public void registerUser(RegisterRequest request) {
         try {
             User user = new User(
                     null,
@@ -28,12 +31,11 @@ public class UserService {
                     passwordEncoder.encode(request.password()),
                     request.email(),
                     LocalDate.now(),
-                    null);
+                    new ArrayList<Post>(),
+                    new Profile());
             userRepository.save(user);
-            return true;
         } catch (Exception e) {
             log.info("Error: {}", e.getMessage());
-            return false;
         }
     }
 }

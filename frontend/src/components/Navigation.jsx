@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useLayoutEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import {
   DropdownMenu,
@@ -7,12 +10,38 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 
+gsap.registerPlugin(ScrollTrigger)
+
 export function Navigation() {
+  const navRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const nav = navRef.current
+
+    gsap.to(nav, {
+      scrollTrigger: {
+        trigger: document.body,
+        start: "top+=60 top",
+        end: "bottom top",
+        scrub: true,
+      },
+      width: "40%",
+      // backgroundColor: "black",
+      margin: "10px",
+      borderRadius: "20px",
+      border: "1px solid gray",
+      ease: "power2.out",
+    })
+  }, [])
+
   return (
-    <nav className="absolute top-0 backdrop-blur-md w-full">
+    <nav
+      ref={navRef}
+      className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full mx-auto z-50 backdrop-blur-md text-gray-900 transition-all duration-300"
+    >
       <div className="mx-auto px-4">
         <div className="flex items-center justify-between h-16 sm:px-10">
-          <Link to="/" className="text-2xl text-gray-900 font-semibold">
+          <Link to="/" className="text-2xl font-semibold">
             <h2>Logsy</h2>
           </Link>
 
@@ -27,11 +56,10 @@ export function Navigation() {
             </div>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <div className="p-3 py-2 shadow-md bg-white rounded-lg bg-muted">
+                <div className="p-3 py-2 shadow-md bg-white rounded-lg">
                   Menu
                 </div>
               </DropdownMenuTrigger>

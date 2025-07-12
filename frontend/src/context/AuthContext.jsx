@@ -1,39 +1,49 @@
 import apiClient from "@/api/AxiosApiService"
-import { createContext, useContext, useEffect, useState } from "react"
+import { jwtDecode } from "jwt-decode"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
 
 const AuthContext = createContext()
 
 export function AuthContextProvider({ children }) {
   const [token, setToken] = useState(null)
-  const [userEmail, setUserEmail] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  const interceptorId = useRef(null)
 
   function register(data) {
     return apiClient.post("/api/register", data)
   }
 
+  function applyInterceptor(token) {
+    if (interceptorId.current !== null) {
+      apiClient.interceptors.request.eject(interceptorId.current)
+    }
+
+    interceptorId.current = apiClient.interceptors.request.use((config) => {
+      config.headers.Authorization = "Bearer " + token
+      return config
+    })
+  }
+
   async function login(email, password) {
     try {
-      const response = await apiClient.post(
-        "/api/login",
-        {},
-        {
-          headers: {
-            Authorization: `Basic ${window.btoa(`${email}:${password}`)}`,
-          },
-        }
-      )
+      const response = await apiClient.post("/api/login", null, {
+        headers: {
+          Authorization: `Basic ${window.btoa(`${email}:${password}`)}`,
+        },
+      })
       console.log("response:", response)
       const { status } = response
       if (status !== 200) throw new Error("HTTP status code: " + status)
 
       const {
-        data: { token },
+        data: { token: retrievedToken },
       } = response
-      setToken(token)
-
-      if (localStorage) {
-        localStorage.setItem("token", token)
-      }
+      applyInterceptor(retrievedToken)
+      setToken(retrievedToken)
+      setIsAuthenticated(true)
+      localStorage.setItem("token", retrievedToken)
 
       return status
     } catch (error) {
@@ -41,18 +51,41 @@ export function AuthContextProvider({ children }) {
     }
   }
 
+  function logout() {
+    setToken(null)
+    if (interceptorId.current !== null) {
+      apiClient.interceptors.request.eject(interceptorId.current)
+    }
+    localStorage.removeItem("token")
+  }
+
   useEffect(() => {
-    if (!localStorage) return
-
     const existingToken = localStorage.getItem("token")
-    if (!existingToken) return
+    if (!existingToken) {
+      setToken(null)
+      setLoading(false)
+      return
+    }
 
-    setToken(existingToken)
+    try {
+      const { exp } = jwtDecode(existingToken)
+      if (Date.now() < exp * 1000) {
+        applyInterceptor(existingToken)
+        setIsAuthenticated(true)
+        setToken(existingToken)
+      } else {
+        localStorage.removeItem("token")
+      }
+      console.log("Ran successfully")
+    } catch {
+      localStorage.removeItem("token")
+    }
+    setLoading(false)
   }, [])
 
   return (
     <AuthContext.Provider
-      value={{ token, register, login, userEmail, setUserEmail }}
+      value={{ token, register, login, logout, loading, isAuthenticated }}
     >
       {children}
     </AuthContext.Provider>

@@ -183,6 +183,7 @@ export default function RegisterPage() {
                     type={field.type}
                     placeholder={field.placeholder}
                     value={formData[field.name]}
+                    maxLength={30}
                     onChange={handleInputChange}
                     required
                   />

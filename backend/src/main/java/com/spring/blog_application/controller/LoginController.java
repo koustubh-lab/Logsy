@@ -30,7 +30,7 @@ public class LoginController {
         var claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(60 * 60))
+                .expiresAt(Instant.now().plusSeconds(60 * 60 * 60))
                 .subject(authentication.getName())
                 .claim("scope", createScope(authentication))
                 .build();

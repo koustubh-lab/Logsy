@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email);
 
         return new CustomUserDetails(
-                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_USER")),
                 true,
