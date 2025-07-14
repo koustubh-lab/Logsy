@@ -28,12 +28,7 @@ export function AuthContextProvider({ children }) {
 
   async function login(email, password) {
     try {
-      const response = await apiClient.post("/api/login", null, {
-        headers: {
-          Authorization: `Basic ${window.btoa(`${email}:${password}`)}`,
-        },
-      })
-      console.log("response:", response)
+      const response = await apiClient.post("/api/login", { email, password })
       const { status } = response
       if (status !== 200) throw new Error("HTTP status code: " + status)
 
@@ -57,6 +52,7 @@ export function AuthContextProvider({ children }) {
       apiClient.interceptors.request.eject(interceptorId.current)
     }
     localStorage.removeItem("token")
+    setIsAuthenticated(false)
   }
 
   useEffect(() => {
@@ -76,7 +72,6 @@ export function AuthContextProvider({ children }) {
       } else {
         localStorage.removeItem("token")
       }
-      console.log("Ran successfully")
     } catch {
       localStorage.removeItem("token")
     }

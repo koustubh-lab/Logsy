@@ -1,4 +1,7 @@
-import { commentByUserApi } from "@/api/CommentApiService"
+import {
+  commentByUserApi,
+  deleteCommentByUserApi,
+} from "@/api/CommentApiService"
 import { getPostByIdApi } from "@/api/PostApiService"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -165,6 +168,19 @@ export default function BlogPostPage() {
     toast.info("button clicked")
   }
 
+  async function handleDeleteComment(commentId) {
+    e.preventDefault()
+    if (commentId === null) {
+      toast.error("Could not perform the operation")
+    }
+
+    try {
+      const { status } = await deleteCommentByUserApi(commentId)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     getPostById()
   }, [token])
@@ -275,7 +291,7 @@ export default function BlogPostPage() {
                       <div>
                         <div
                           key={comment.id}
-                          className="border-l-4 border-blue-200 pl-4 p-2 bg-slate-50 rounded-md border"
+                          className="border-l-4 border-blue-200 pl-4 p-2 bg-slate-50 rounded-md rounded-br-none"
                         >
                           <div
                             className={`flex items-center justify-between gap-1 text-sm text-gray-500 mb-2`}
@@ -310,7 +326,13 @@ export default function BlogPostPage() {
                                       Edit
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-400 hover:text-red-400 hover:bg-red-200">
+                                    <DropdownMenuItem
+                                      className="text-red-400 hover:bg-red-200 cursor-pointer"
+                                      onSelect={(e) => {
+                                        e.preventDefault()
+                                        handleDeleteComment(comment?.id)
+                                      }}
+                                    >
                                       Delete
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>

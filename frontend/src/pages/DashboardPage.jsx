@@ -49,7 +49,7 @@ export default function DashboardPage() {
   async function getPostsForUserByPage() {
     if (token) {
       try {
-        const response = await getPostsForUserByPageApi(page)
+        const response = await getPostsForUserByPageApi(page, 3)
         if (response.status !== 200) throw new Error(response)
 
         const { data } = response

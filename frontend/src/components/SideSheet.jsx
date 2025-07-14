@@ -1,4 +1,5 @@
-import { Frown } from "lucide-react"
+import useAuth from "@/context/AuthContext"
+import { Circle, Frown } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { Button } from "./ui/button"
@@ -27,12 +28,16 @@ export default function SideSheet() {
   const [isOpen, setIsOpen] = useState(false)
   const lastClosedAtRef = useRef(null)
   const [startX, setStartX] = useState(null)
-
   const location = useLocation()
+  const { logout } = useAuth()
 
   const tabOptions = "dashboard, profile, explore, create-post, logout".split(
     ", "
   )
+
+  function handleLogoutAction() {
+    logout()
+  }
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -42,7 +47,7 @@ export default function SideSheet() {
       const canOpen =
         !lastClosedAtRef.current || now - lastClosedAtRef.current > OPEN_DELAY
 
-      if (canOpen && e.clientX > window.innerWidth - 30) {
+      if (canOpen && e.clientX > window.innerWidth - 10) {
         setIsOpen(true)
       }
     }
@@ -90,9 +95,14 @@ export default function SideSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Navigation Bar</SheetTitle>
-          <SheetDescription>
+        <SheetHeader className={"bg-slate-800 p-2 rounded-md"}>
+          <SheetTitle>
+            <div className="flex gap-2 items-center p-2">
+              <img src="/logsy.svg" alt="Logsy" className="h-14 w-1h-14 " />
+              <h1 className="text-3xl md:text-5xl text-white">Logsy</h1>
+            </div>
+          </SheetTitle>
+          <SheetDescription className="text-muted">
             Select any of the options below to change current tab
           </SheetDescription>
         </SheetHeader>
@@ -124,7 +134,12 @@ export default function SideSheet() {
                       <DialogClose>
                         <Button variant="secondary">Cancel</Button>
                       </DialogClose>
-                      <Button variant="destructive">Logout</Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleLogoutAction}
+                      >
+                        Logout
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -136,7 +151,15 @@ export default function SideSheet() {
                     location.pathname.endsWith(tab) ? "bg-slate-100" : ""
                   }`}
                 >
-                  <Link to={`/home/${tab}`}>{tab}</Link>
+                  <Link
+                    to={`/home/${tab}`}
+                    className="flex justify-between items-center w-full group"
+                  >
+                    {tab}
+                    {location.pathname.endsWith(tab) && (
+                      <Circle fill="#334155" className={"h-5 w-5"} />
+                    )}
+                  </Link>
                 </Button>
               )}
             </div>

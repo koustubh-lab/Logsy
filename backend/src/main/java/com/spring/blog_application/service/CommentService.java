@@ -7,6 +7,7 @@ import com.spring.blog_application.repository.CommentRepository;
 import com.spring.blog_application.repository.PostRepository;
 import com.spring.blog_application.repository.UserRepository;
 import com.spring.blog_application.utils.CreateCommentRequest;
+import com.spring.blog_application.utils.DeleteCommentRequest;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -36,5 +37,9 @@ public class CommentService {
         Comment comment = new Comment(null, request.comment(), LocalDateTime.now(), post, user);
         post.getComments().add(comment);
         commentRepository.save(comment);
+    }
+
+    public void deleteCommentByUser(DeleteCommentRequest request, String email) {
+        commentRepository.deleteById(request.commentId());
     }
 }

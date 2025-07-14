@@ -28,8 +28,8 @@ export function Navigation() {
       width: "40%",
       // backgroundColor: "black",
       margin: "10px",
-      borderRadius: "20px",
-      border: "1px solid gray",
+      borderRadius: "50px",
+      border: "0.5px solid gray",
       ease: "power2.out",
     })
   }, [])
@@ -65,10 +65,10 @@ export function Navigation() {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem>
-                  <Link to="/login">Login</Link>
+                  <Link to="/login" className="w-full">Login</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/register">Register</Link>
+                  <Link to="/register" className="w-full">Register</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

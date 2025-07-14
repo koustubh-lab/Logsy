@@ -1,11 +1,11 @@
 import apiClient from "./AxiosApiService"
 
-export const createBlogForUserApi = (title, content) => {
-  return apiClient.post("/api/create-post", {title, content})
+export const createBlogForUserApi = (title, content, description, tagNames) => {
+  return apiClient.post("/api/create-post", {title, content, description, tagNames})
 }
 
-export function getPostsForUserByPageApi(page) {
-  return apiClient.get(`/api/posts?page=${page}`)
+export function getPostsForUserByPageApi(page, size = 3) {
+  return apiClient.get(`/api/posts?page=${page}&size=${size}`)
 }
 
 export function getPostByIdApi(post_id) {

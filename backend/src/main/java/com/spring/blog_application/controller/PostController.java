@@ -27,8 +27,10 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<PostDTO>> getPostsByPage(@RequestParam(defaultValue = "0") int page, Authentication authentication) {
-        return ResponseEntity.ok(postService.getPostsByPage(page, authentication.getName()).getContent());
+    public ResponseEntity<List<PostDTO>> getPostsByPage(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "3") int size,
+                                                        Authentication authentication) {
+        return ResponseEntity.ok(postService.getPostsByPage(page, size, authentication.getName()).getContent());
     }
 
     @PostMapping("/create-post")

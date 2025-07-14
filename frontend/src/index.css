@@ -6,12 +6,36 @@
   font-family: "Inter", sans-serif;
 }
 
-h1,
+/* h1,
 h2,
 h3,
 h4 {
   font-family: "Poppins";
+} */
+
+pre.ql-syntax {
+  font-family: "Jetbrains Mono" !important;
 }
+
+@keyframes spinAndLeft {
+  0% {
+    opacity: 0;
+    transform: rotate(-90deg) translateX(0);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg) translateX(-8px);
+  }
+}
+
+.spin-and-left {
+  animation: spinAndLeft 500ms ease forwards;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+
 
 input:-webkit-autofill {
   box-shadow: 0 0 0px 1000px transparent inset !important;

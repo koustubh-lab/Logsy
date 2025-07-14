@@ -2,7 +2,6 @@ import { motion } from "framer-motion"
 
 export default function BarsLoader() {
   const bars = [0, 1, 2, 3, 4]
-  console.log('bar loader mounted');
 
   return (
     <div className="flex items-end justify-center gap-1 h-10 py-10 w-full">

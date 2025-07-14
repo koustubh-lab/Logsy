@@ -3,9 +3,11 @@ package com.spring.blog_application.service;
 import com.spring.blog_application.dto.CommentDTO;
 import com.spring.blog_application.dto.PostDTO;
 import com.spring.blog_application.model.Post;
+import com.spring.blog_application.model.Tag;
 import com.spring.blog_application.model.User;
 import com.spring.blog_application.repository.CommentRepository;
 import com.spring.blog_application.repository.PostRepository;
+import com.spring.blog_application.repository.TagRepository;
 import com.spring.blog_application.repository.UserRepository;
 import com.spring.blog_application.utils.CreatePostRequest;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,11 +28,13 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final TagRepository tagRepository;
 
-    public PostService(UserRepository userRepository, PostRepository postRepository, CommentRepository commentRepository) {
+    public PostService(UserRepository userRepository, PostRepository postRepository, CommentRepository commentRepository, TagRepository tagRepository) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.tagRepository = tagRepository;
     }
 
     public void createPostForUser(CreatePostRequest request, String email) {
@@ -39,14 +43,25 @@ public class PostService {
             throw new RuntimeException("User was not found");
         }
 
+        List<Tag> tagList = request.tagNames().stream().map(tagName -> {
+            Tag existingTag = tagRepository.findByName(tagName);
+            if (existingTag != null) {
+                return existingTag;
+            } else {
+                return tagRepository.save(new Tag(null, tagName, new ArrayList<>()));
+            }
+        }).toList();
+
         Post postToBeInserted = new Post(
                 null,
                 request.title(),
                 request.content(),
+                request.description(),
                 LocalDateTime.now(),
                 existingUser,
                 new ArrayList<>(),
-                new ArrayList<>()
+                new ArrayList<>(),
+                tagList
         );
 
         existingUser.getPosts().add(postToBeInserted);
@@ -54,8 +69,8 @@ public class PostService {
         userRepository.save(existingUser);
     }
 
-    public Page<PostDTO> getPostsByPage(int page, String email) {
-        Pageable pageable = PageRequest.of(page, 3, Sort.by("createdAt").ascending());
+    public Page<PostDTO> getPostsByPage(int page, int size, String email) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
         Page<Post> postPage = postRepository.findByUserEmail(email, pageable);
 
         return postPage
@@ -63,6 +78,7 @@ public class PostService {
                 new PostDTO(
                     post.getId(),
                     post.getTitle(),
+                    post.getDescription(),
                     post.getContent(),
                     post.getCreatedAt(),
                     post.getUser().getUsername(),
@@ -97,7 +113,7 @@ public class PostService {
                                 )
                         ).toList();
 
-        return new PostDTO(post.getId(), post.getTitle(), post.getContent(), post.getCreatedAt(), post.getUser().getUsername(), commentDTOList, true);
+        return new PostDTO(post.getId(), post.getTitle(), post.getDescription(), post.getContent(), post.getCreatedAt(), post.getUser().getUsername(), commentDTOList, true);
     }
 
     public void deletePostById(Integer id) {

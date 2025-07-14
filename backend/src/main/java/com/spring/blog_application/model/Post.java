@@ -23,6 +23,7 @@ public class Post {
     private Integer id;
 
     private String title;
+    private String description;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -37,4 +38,12 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Like> likes = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "post_tags",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();
 }

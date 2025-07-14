@@ -2,13 +2,12 @@ import { lazy, Suspense } from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import BarsLoader from "./components/BarLoader"
 import EditPostPage from "./pages/EditPage"
-import HomeLayout from "./pages/HomeLayout"
 import ProtectedRoute from "./pages/ProtectedRoute"
 
 const LandingPage = lazy(() => import("./pages/LandingPage"))
 const LoginPage = lazy(() => import("./pages/LoginPage"))
 const RegisterPage = lazy(() => import("./pages/RegisterPage"))
-// const HomeLayout = lazy(() => import("./pages/HomeLayout"))
+const HomeLayout = lazy(() => import("./pages/HomeLayout"))
 const DashboardPage = lazy(() => import("./pages/DashboardPage"))
 const ProfilePage = lazy(() => import("./pages/ProfilePage"))
 const ExplorePage = lazy(() => import("./pages/ExplorePage"))
