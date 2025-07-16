@@ -1,4 +1,4 @@
-package com.spring.blog_application.controller;
+package com.spring.blog_application.utils;
 
 public record TokenRequest(String token) {
 }

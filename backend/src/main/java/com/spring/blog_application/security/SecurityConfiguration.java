@@ -21,14 +21,9 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SecurityConfiguration {
@@ -40,28 +35,32 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/register", "/api/login", "/api/login/with-email").permitAll()
+                        .requestMatchers(
+                                "/api/request-email-login",
+                                "/api/request-account-registration",
+                                "/api/validate-login-magic-link",
+                                "/api/validate-activation-magic-link"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-                .userDetailsService(customUserDetailsService);
-
-        return http.build();
+                .userDetailsService(customUserDetailsService)
+                .build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    
+
     @Bean
-    public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
+    public NimbusJwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
         return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
     }
 

@@ -1,10 +1,10 @@
 import { motion } from "framer-motion"
 
 export default function BarsLoader() {
-  const bars = [0, 1, 2, 3, 4]
+  const bars = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
   return (
-    <div className="flex items-end justify-center gap-1 h-10 py-10 w-full">
+    <div className="flex items-end justify-center gap-2 h-40 py-10 w-full">
       {bars.map((i) => (
         <motion.div
           key={i}

@@ -1,4 +1,5 @@
 import { Navigation } from "@/components/navigation"
+import RippleGrid from "@/components/RippleGrid/RippleGrid"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -78,11 +79,26 @@ const blogPosts = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Navigation />
+      <div className="absolute top-0 left-0 z-[-1]">
+        <div className="relative h-screen w-screen overflow-hidden bg-black">
+          <RippleGrid
+            enableRainbow={false}
+            gridColor="#6600ff"
+            rippleIntensity={0.05}
+            gridSize={20}
+            gridThickness={15}
+            glowIntensity={1}
+            mouseInteraction={false}
+            mouseInteractionRadius={1.2}
+            opacity={0.8}
+          />
+        </div>
+      </div>
 
       <motion.section
-        className="border-b min-h-screen flex justify-center items-center bg-gradient-to-br from-slate-100 via-slate-200 to-white"
+        className="border-b min-h-screen flex justify-center items-center bg-transparent"
         initial="hidden"
         animate="visible"
         variants={{
@@ -96,7 +112,7 @@ export default function LandingPage() {
         }}
       >
         <motion.div
-          className="container mx-auto grid justify-items-center max-w-[80%]"
+          className="container mx-auto grid gap-5 justify-items-center max-w-[80%]"
           variants={{
             hidden: { opacity: 0, y: 50 },
             visible: {
@@ -117,25 +133,11 @@ export default function LandingPage() {
               },
             }}
           >
-            <span className="whitespace-nowrap">Built For Bloggers And</span>{" "}
-            <span>Loved By Thinkers.</span>
+            <span className="whitespace-nowrap text-white/80">
+              Built For Bloggers And
+            </span>{" "}
+            <span className="text-white/80">Loved By Thinkers.</span>
           </motion.h1>
-
-          <motion.p
-            className="text-sm sm:text-base md:text-xl text-gray-600 mb-8 max-w-4xl text-center"
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.6, ease: "easeOut" },
-              },
-            }}
-          >
-            Discover the latest insights, tutorials, and best practices in web
-            development. Join our community of developers and stay ahead of the
-            curve.
-          </motion.p>
 
           <motion.div
             className="flex gap-3"
@@ -144,10 +146,10 @@ export default function LandingPage() {
               visible: { opacity: 1, transition: { duration: 0.5 } },
             }}
           >
-            <Button size="lg" asChild>
+            <Button size="lg" variant="outline" asChild>
               <Link to={"/register"}>Get Started For Free</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            <Button size="lg" asChild>
               <Link to={"/about"}>About Us</Link>
             </Button>
           </motion.div>

@@ -8,7 +8,7 @@ export default function HomeLayout() {
       <SideSheet />
 
       {/* Main content changes based on child route */}
-      <div className="flex-1">
+      <div className="flex-1 max-w-full">
         <Outlet />
       </div>
     </div>

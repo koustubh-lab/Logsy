@@ -12,7 +12,7 @@ export function AuthContextProvider({ children }) {
   const interceptorId = useRef(null)
 
   function register(data) {
-    return apiClient.post("/api/register", data)
+    return apiClient.post("/api/request-account-registration", data)
   }
 
   function applyInterceptor(token) {
@@ -26,15 +26,18 @@ export function AuthContextProvider({ children }) {
     })
   }
 
-  async function login(email, password) {
+  async function login(urlToken) {
     try {
-      const response = await apiClient.post("/api/login", { email, password })
-      const { status } = response
+      const response = await apiClient.post("/api/validate-login-magic-link", {
+        token: urlToken,
+      })
+      console.log(response)
+      const { status, data } = response
       if (status !== 200) throw new Error("HTTP status code: " + status)
 
-      const {
-        data: { token: retrievedToken },
-      } = response
+      const { token: retrievedToken } = data
+      if (!retrievedToken) return 401
+
       applyInterceptor(retrievedToken)
       setToken(retrievedToken)
       setIsAuthenticated(true)
@@ -71,9 +74,11 @@ export function AuthContextProvider({ children }) {
         setToken(existingToken)
       } else {
         localStorage.removeItem("token")
+        console.log("token expired")
       }
-    } catch {
+    } catch (error) {
       localStorage.removeItem("token")
+      console.log("error in token decoding")
     }
     setLoading(false)
   }, [])

@@ -9,20 +9,17 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final String email;
-    private final String password;
     private final List<GrantedAuthority> authorities;
     private final boolean isAccountNonLocked;
     private final boolean isEnabled;
 
     public CustomUserDetails(
             String email,
-            String password,
             List<GrantedAuthority> authorities,
             boolean isAccountNonLocked,
             boolean isEnabled
     ) {
         this.email = email;
-        this.password = password;
         this.authorities = authorities;
         this.isAccountNonLocked = isAccountNonLocked;
         this.isEnabled = isEnabled;
@@ -35,7 +32,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return null;
     }
 
     @Override

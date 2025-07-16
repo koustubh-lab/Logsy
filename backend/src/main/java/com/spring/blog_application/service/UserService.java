@@ -5,6 +5,7 @@ import com.spring.blog_application.model.Profile;
 import com.spring.blog_application.model.User;
 import com.spring.blog_application.repository.UserRepository;
 import com.spring.blog_application.utils.RegisterRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,26 +17,40 @@ import java.util.ArrayList;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public void registerUser(RegisterRequest request) {
         try {
-            User user = new User(
-                    null,
-                    request.username(),
-                    passwordEncoder.encode(request.password()),
-                    request.email(),
-                    LocalDate.now(),
-                    new ArrayList<Post>(),
-                    new Profile());
+            User user = User.builder()
+                    .username(request.username())
+                    .email(request.email())
+                    .createdAt(LocalDate.now())
+                    .posts(new ArrayList<>())
+                    .profile(new Profile())
+                    .enabled(false)
+                    .build();
             userRepository.save(user);
         } catch (Exception e) {
             log.info("Error: {}", e.getMessage());
         }
+    }
+
+    public boolean doesUserExist(String email) {
+        User user = userRepository.findByEmail(email);
+        return user != null;
+    }
+
+    public boolean doesUserNotExist(String email) {
+        User user = userRepository.findByEmail(email);
+        return user == null;
+    }
+
+    public void activateUserAccount(String email) {
+        User user = userRepository.findByEmail(email);
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 }

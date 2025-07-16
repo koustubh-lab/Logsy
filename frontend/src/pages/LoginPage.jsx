@@ -1,3 +1,4 @@
+import { sendLoginRequest } from "@/api/AuthApiService"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -9,10 +10,9 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import useAuth from "@/context/AuthContext"
 import { motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { toast } from "sonner"
 
 const containerVariants = {
@@ -41,15 +41,11 @@ const itemVariants = {
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [errors, setErrors] = useState({ email: "", password: "" })
+  const [errors, setErrors] = useState({ email: "" })
   const inputRef = useRef(null)
 
-  const navigate = useNavigate()
-  const { login } = useAuth()
-
   const validateForm = () => {
-    const newErrors = { email: "", password: "" }
+    const newErrors = { email: "" }
     let isValid = true
 
     if (!email) {
@@ -57,14 +53,6 @@ export default function LoginPage() {
       isValid = false
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Email is invalid"
-      isValid = false
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required"
-      isValid = false
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
       isValid = false
     }
 
@@ -79,12 +67,16 @@ export default function LoginPage() {
     }
 
     try {
-      const status = await login(email, password)
+      const response = await sendLoginRequest(email)
+      const { status } = response
       if (status === 200) {
-        toast.success("Logged-in Successfully")
-        setTimeout(() => {
-          navigate("/home/dashboard")
-        }, 1000)
+        toast.info("Login Mail Sent", {
+          description: "Click on the link inside the received mail to login",
+          action: {
+            label: "Open Gmail",
+            onClick: () => window.open("https://mail.google.com", "_blank"),
+          },
+        })
       }
     } catch (error) {
       toast.error(error.message)
@@ -131,23 +123,6 @@ export default function LoginPage() {
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </motion.div>
-              <motion.div variants={itemVariants} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                    setErrors((prev) => ({ ...prev, ["password"]: "" }))
-                  }}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
                 )}
               </motion.div>
             </CardContent>

@@ -1,5 +1,6 @@
 import { getPostsForUserByPageApi } from "@/api/PostApiService"
 import { BlogPostCard } from "@/components/BlogPostCard"
+import { BlogPostCardPlaceholder } from "@/components/BlogPostCardPlaceholder"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
@@ -74,9 +75,9 @@ export default function ExplorePage() {
   }, [])
 
   return (
-    <main className="container mx-auto max-h-screen overflow-hidden">
-      <div className="sticky top-0 z-10 bg-white p-2 px-5 pt-8 shadow-sm">
-        <div className="flex flex-col items-center justify-between gap-4 md:flex-row mb-8">
+    <main className="h-screen flex flex-col">
+      <div className="sticky top-0 z-10 bg-white p-2 px-5 pt-4 sm:pt-8 shadow-sm">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row mb-4 sm:mb-8">
           <h1 className="text-3xl font-semibold md:text-4xl text-center md:text-left">
             Explore Blog Posts
           </h1>
@@ -92,32 +93,34 @@ export default function ExplorePage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 overflow-hidden px-2 sm:px-0">
+        <div className="flex items-center px-2 sm:px-0 gap-2 w-full mx-auto max-w-[95vw]">
           <Button
-            className="shadow rounded-lg flex-shrink-0"
+            className="shrink-0 shadow rounded-lg hidden sm:block"
             onClick={() => scrollTags("left")}
           >
             <ChevronLeft size={20} />
           </Button>
 
-          <div
-            ref={scrollRef}
-            className="flex gap-3 overflow-x-auto max-w-full scrollbar-hide"
-          >
-            {options.map((option) => (
-              <Button
-                key={option.value}
-                variant="outline"
-                className="px-4 py-1 text-sm rounded-full whitespace-nowrap"
-                onClick={() => handleTagSelect(option.value)}
-              >
-                {option.label}
-              </Button>
-            ))}
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div
+              ref={scrollRef}
+              className="flex gap-3 overflow-x-auto scrollbar-hide"
+            >
+              {options.map((option) => (
+                <Button
+                  key={option.value}
+                  variant="outline"
+                  className="px-4 py-1 text-sm rounded-full whitespace-nowrap"
+                  onClick={() => handleTagSelect(option.value)}
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <Button
-            className="shadow rounded-lg flex-shrink-0"
+            className="shrink-0 shadow rounded-lg hidden sm:block"
             onClick={() => scrollTags("right")}
           >
             <ChevronRight size={20} />
@@ -125,10 +128,14 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      <div className="grid h-[75vh] overflow-auto gap-8 p-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-min">
-        {blogPosts.map((post, idx) => (
-          <BlogPostCard key={idx} {...post} />
-        ))}
+      <div className="flex-1 overflow-auto">
+        <div className="grid overflow-auto gap-8 p-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-min">
+          {blogPosts.length > 0
+            ? blogPosts.map((post, idx) => <BlogPostCard key={idx} {...post} />)
+            : [1, 2, 3, 4, 5, 6, 7, 8].map((item) => {
+                return <BlogPostCardPlaceholder key={item} />
+              })}
+        </div>
       </div>
     </main>
   )

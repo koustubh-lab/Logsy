@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import useAuth from "@/context/AuthContext"
+import { Filter } from "bad-words"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -46,12 +47,11 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const { register } = useAuth()
+  const filter = new Filter()
 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: "",
-    confirmPassword: "",
   })
 
   const [formErrors, setFormErrors] = useState({})
@@ -66,14 +66,11 @@ export default function RegisterPage() {
       errors.username =
         "Username must be at least 6 characters and can contain only letters"
 
+    if (filter.isProfane(formData.username))
+      errors.username = "Inappropriate words are not allowed in usernames."
+
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email))
       errors.email = "Please enter a valid email"
-
-    if (!formData.password || formData.password.length < 8)
-      errors.password = "Password must be at least 8 characters"
-
-    if (formData.password !== formData.confirmPassword)
-      errors.confirmPassword = "Passwords do not match"
 
     return errors
   }
@@ -106,15 +103,18 @@ export default function RegisterPage() {
 
     setIsLoading(true)
     try {
-      const { username, password, email } = formData
-      const response = await register({ username, password, email })
+      const { username, email } = formData
+      const response = await register({ username, email })
       if (response.status === 200) {
         toast.success("Account Created 🎉", {
+          description:
+            "But To activate your account, click the link in your Gmail Inbox",
           action: {
-            label: "Login",
-            onClick: () => navigate("/login"),
+            label: "Open Gmail",
+            onClick: () => window.open("https://mail.google.com", "_blank"),
           },
         })
+        setFormData({ username: "", email: "" })
       }
     } catch {
       toast.error("Something went wrong!")
@@ -160,20 +160,6 @@ export default function RegisterPage() {
                   label: "Email",
                   placeholder: "your@email.com",
                 },
-                {
-                  id: "password",
-                  name: "password",
-                  type: "password",
-                  label: "Password",
-                  placeholder: "Create a strong password",
-                },
-                {
-                  id: "confirmPassword",
-                  name: "confirmPassword",
-                  type: "password",
-                  label: "Confirm Password",
-                  placeholder: "Repeat password",
-                },
               ].map((field) => (
                 <motion.div variants={itemVariants} key={field.id}>
                   <Label htmlFor={field.id}>{field.label}</Label>
@@ -218,18 +204,13 @@ export default function RegisterPage() {
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={!termsAccepted || isLoading}
                 >
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={!termsAccepted || isLoading}
-                  >
-                    {isLoading ? "Processing..." : "Create Account"}
-                  </Button>
-                </motion.div>
+                  {isLoading ? "Processing..." : "Create Account"}
+                </Button>
               </motion.div>
             </form>
 

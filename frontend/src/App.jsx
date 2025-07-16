@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import BarsLoader from "./components/BarLoader"
 import EditPostPage from "./pages/EditPage"
 import ProtectedRoute from "./pages/ProtectedRoute"
+import ValidateActivationTokenPage from "./pages/ValidateActivationTokenPage"
 
 const LandingPage = lazy(() => import("./pages/LandingPage"))
 const LoginPage = lazy(() => import("./pages/LoginPage"))
@@ -14,6 +15,9 @@ const ExplorePage = lazy(() => import("./pages/ExplorePage"))
 const CreatePostPage = lazy(() => import("./pages/CreatePostPage"))
 const BlogPostPage = lazy(() => import("./pages/PostPage"))
 const InvalidRoutePage = lazy(() => import("./pages/InvalidRoutePage"))
+const ValidateLoginTokenPage = lazy(() =>
+  import("./pages/ValidateLoginTokenPage")
+)
 
 function App() {
   const router = createBrowserRouter([
@@ -24,6 +28,14 @@ function App() {
     {
       path: "/login",
       element: <LoginPage />,
+    },
+    {
+      path: "/validate-login-token",
+      element: <ValidateLoginTokenPage />,
+    },
+    {
+      path: "/activate-account",
+      element: <ValidateActivationTokenPage />,
     },
     {
       path: "/register",

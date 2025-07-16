@@ -3,15 +3,14 @@
 @tailwind utilities;
 
 * {
+  box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
 
-/* h1,
-h2,
-h3,
-h4 {
-  font-family: "Poppins";
-} */
+body {
+  scrollbar-width: thin;
+  overflow-x: hidden;
+}
 
 pre.ql-syntax {
   font-family: "Jetbrains Mono" !important;
@@ -41,6 +40,14 @@ input:-webkit-autofill {
   box-shadow: 0 0 0px 1000px transparent inset !important;
   -webkit-text-fill-color: inherit !important;
   transition: background-color 9999s ease-in-out 0s;
+}
+
+.logsy-scrolled {
+  color: black;
+}
+
+.login-scrolled {
+  color: black !important;
 }
 
 @layer base {
