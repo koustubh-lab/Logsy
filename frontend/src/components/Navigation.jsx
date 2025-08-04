@@ -1,108 +1,135 @@
 import { Button } from "@/components/ui/button"
+import useAuth from "@/context/AuthContext"
+import useIsMobile from "@/hooks/IsMobile"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { Menu, MoveRight, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+import { Separator } from "./ui/separator"
 
 gsap.registerPlugin(ScrollTrigger)
 
 export function Navigation() {
-  /* const navRef = useRef(null)
-  const logsyRef = useRef(null)
-  const loginRef = useRef(null)
-  const registerRef = useRef(null)
+  const isMobile = useIsMobile()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const { isAuthenticated } = useAuth()
 
-  useLayoutEffect(() => {
-    const startPoint = `${window.innerHeight} top`
+  const navItems = [
+    { label: "Home", href: "#hero-section" },
+    { label: "About", href: "#about" },
+    { label: "Features", href: "#features" },
+    { label: "Posts", href: "#explore-posts" },
+    { label: "Contact", href: "#contact" },
+  ]
 
-    // Nav resizing on scroll
-    gsap.to(navRef.current, {
-      scrollTrigger: {
-        trigger: document.body,
-        start: "top+=60 top",
-        end: "bottom top",
-        scrub: true,
-      },
-      width: "40%",
-      margin: "10px",
-      borderRadius: "50px",
-      border: "0.5px solid gray",
-      ease: "power2.out",
-    })
+  const handleResize = () => {
+    setMobileNavOpen(false)
+  }
 
-    // Individual ScrollTriggers for color/style changes
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: startPoint,
-      toggleClass: { targets: logsyRef.current, className: "logsy-scrolled" },
-    })
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileNavOpen(false)
+    }
+    window.addEventListener("resize", handleResize)
 
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: startPoint,
-      toggleClass: { targets: loginRef.current, className: "login-scrolled" },
-    })
-
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: startPoint,
-      toggleClass: {
-        targets: registerRef.current,
-        className: "register-scrolled",
-      },
-    })
-  }, []) */
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
 
   return (
-    <nav className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full mx-auto z-50 backdrop-blur-md text-gray-900 transition-all duration-300">
-      <div className="mx-auto px-4">
-        <div className="flex items-center justify-between h-16 sm:px-10">
-          <Link to="/" className="text-2xl font-semibold text-white">
+    <nav className="fixed top-0 w-full z-50 bg-background/20 backdrop-blur-2xl text-white shadow-lg transition-all duration-300">
+      <div className="mx-auto px-1">
+        <div className="flex items-center justify-between h-16 px-6">
+          <a
+            href="/"
+            className="text-xl sm:text-2xl font-semibold text-white flex gap-2 items-center"
+          >
+            <img
+              src="/logsy-new-logo-compressed.png"
+              alt=""
+              className="w-8 h-8"
+            />
             <h2>Logsy</h2>
-          </Link>
+          </a>
 
+          {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                className="text-white hover:bg-white/20 hover:text-white"
-                asChild
+            {navItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="opacity-60 hover:opacity-100 duration-300 text-sm cursor-pointer"
               >
-                <Link to="/login">Login</Link>
+                {item.label}
+              </a>
+            ))}
+            <Link to={isAuthenticated ? "/home/dashboard" : "/register"}>
+              <Button className="rounded-full">
+                <span className="flex gap-2 items-center">
+                  {isAuthenticated ? "Dashboard" : "Sign Up"} <MoveRight />
+                </span>
               </Button>
-              <Button variant="outline" asChild>
-                <Link to="/register">Register</Link>
-              </Button>
-            </div>
+            </Link>
           </div>
 
+          {/* Mobile Button */}
           <div className="md:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="p-3 py-2 shadow-md bg-white rounded-lg">
-                  Menu
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <Link to="/login" className="w-full">
-                    Login
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to="/register" className="w-full">
-                    Register
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="outline"
+              className="bg-muted/40"
+              size={isMobile ? "sm" : ""}
+              onClick={() => setMobileNavOpen(true)}
+            >
+              <Menu className="text-white" />
+            </Button>
           </div>
         </div>
+      </div>
+
+      {/* Fullscreen Mobile Menu */}
+      <div
+        className={`fixed inset-0 z-50 h-screen bg-black/90 text-white transform transition-all duration-500 ease-in-out
+        ${
+          mobileNavOpen
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none"
+        }
+        flex flex-col items-center justify-center space-y-8 backdrop-blur-xl`}
+      >
+        <button
+          className="absolute top-5 right-5 text-white"
+          onClick={() => setMobileNavOpen(false)}
+        >
+          <X size={28} />
+        </button>
+
+        {navItems.map((item) => (
+          <a
+            key={item.label}
+            href={item.href}
+            onClick={() => setMobileNavOpen(false)}
+            className="text-xl opacity-80 hover:opacity-100 transition duration-300"
+          >
+            {item.label}
+          </a>
+        ))}
+        <Separator className="w-5/6 bg-white" />
+        <Link
+          to="/login"
+          onClick={() => setMobileNavOpen(false)}
+          className="text-xl opacity-80 hover:opacity-100 transition duration-300"
+        >
+          Login
+        </Link>
+        <Link
+          to="/register"
+          onClick={() => setMobileNavOpen(false)}
+          className="text-xl opacity-80 hover:opacity-100 transition duration-300"
+        >
+          Register
+        </Link>
       </div>
     </nav>
   )

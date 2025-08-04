@@ -2,9 +2,21 @@ import {
   commentByUserApi,
   deleteCommentByUserApi,
 } from "@/api/CommentApiService"
-import { getPostByIdApi } from "@/api/PostApiService"
+import { likePostByUserApi, unlikePostByUserApi } from "@/api/LikeApiService"
+import { getPostByIdApi, getPostByIdForGuest } from "@/api/PostApiService"
+import BarsLoader from "@/components/BarLoader"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,154 +24,122 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import useAuth from "@/context/AuthContext"
+import { getErrorMessage } from "@/utils/AxoisErrorHandler"
 import { format } from "date-fns"
 import { motion } from "framer-motion"
 import { debounce } from "lodash"
 import {
   CalendarDays,
   Clock,
+  Copy,
   Heart,
   MessageSquare,
   MoreHorizontal,
   User,
 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
-
-const blogPost = {
-  id: 1,
-  title: "Getting Started with React and TypeScript",
-  author: "John Doe",
-  date: "2024-01-15",
-  content: `
-    <h2>Introduction</h2>
-    <p>React and TypeScript make a powerful combination for building modern web applications. TypeScript adds static type checking to JavaScript, which helps catch errors early and provides better developer experience with improved IDE support.</p>
-
-    <h2>Setting Up Your Project</h2>
-    <p>To get started with React and TypeScript, you can use Create React App with the TypeScript template:</p>
-
-    <pre><code>npx create-react-app my-app --template typescript</code></pre>
-
-    <p>This command creates a new React application with TypeScript configuration already set up for you.</p>
-
-    <h2>Basic TypeScript Concepts</h2>
-    <p>Here are some fundamental TypeScript concepts you'll need to understand:</p>
-
-    <ul>
-      <li><strong>Types:</strong> Define the shape of your data</li>
-      <li><strong>Interfaces:</strong> Define contracts for objects</li>
-      <li><strong>Generics:</strong> Create reusable components</li>
-      <li><strong>Union Types:</strong> Allow multiple types for a single variable</li>
-    </ul>
-
-    <h2>React Components with TypeScript</h2>
-    <p>When creating React components with TypeScript, you'll want to define prop types using interfaces:</p>
-
-    <pre><code>interface ButtonProps {
-  children: React.ReactNode;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary';
-}
-
-const Button: React.FC<ButtonProps> = ({ children, onClick, variant = 'primary' }) => {
-  return (
-    <button className={variant} onClick={onClick}>
-      {children}
-    </button>
-  );
-};</code></pre>
-
-    <h2>Conclusion</h2>
-    <p>React and TypeScript together provide a robust foundation for building scalable web applications. The type safety and developer experience improvements make it worth the initial learning curve.</p>
-  `,
-  tags: ["React", "TypeScript", "Web Development"],
-  readTime: "5 min read",
-}
-
-const comments = [
-  {
-    id: 1,
-    author: "Alice Johnson",
-    date: "2024-01-16",
-    content:
-      "Great article! This really helped me understand how to get started with TypeScript in React projects.",
-  },
-  {
-    id: 2,
-    author: "Bob Smith",
-    date: "2024-01-17",
-    content:
-      "Thanks for the detailed explanation. The code examples are very helpful.",
-  },
-  {
-    id: 3,
-    author: "Carol Davis",
-    date: "2024-01-18",
-    content:
-      "I've been hesitant to try TypeScript, but this article convinced me to give it a shot!",
-  },
-]
 
 export default function BlogPostPage() {
   const { id } = useParams()
-  const { token } = useAuth()
+  const { isAuthenticated, loading: authLoading } = useAuth()
 
   const [post, setPost] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isPostLiked, setIsPostLiked] = useState(false)
+  const navigate = useNavigate()
+
   const [comment, setComment] = useState("")
+  const [tags, setTags] = useState([])
+  const [profile, setProfile] = useState(null)
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600)
 
-  const { isAuthenticated } = useAuth()
-
-  const handlePostLike = debounce(() => {
-    setIsPostLiked(!isPostLiked)
-    toast.message(
-      isPostLiked
-        ? "I will try to improve the quality of article 😒"
-        : "I see, you like the article 😘"
-    )
-  }, 300)
+  const handlePostLike = debounce(async () => {
+    if (isAuthenticated) {
+      const functionToCall = isPostLiked
+        ? unlikePostByUserApi
+        : likePostByUserApi
+      try {
+        const response = await functionToCall(post.id)
+        const { status } = response
+        if (status === 200) {
+          const liked = !isPostLiked
+          setIsPostLiked(liked)
+          toast.message(
+            liked
+              ? "I see, you like the article 😘"
+              : "I will try to improve the quality of article 😭"
+          )
+        }
+      } catch (error) {
+        toast.error(getErrorMessage(error))
+      }
+    } else {
+      toast.warning("Sign In Required", {
+        action: {
+          label: "Sign In",
+          onClick: () => navigate("/login"),
+        },
+      })
+    }
+  }, 200)
 
   async function getPostById() {
-    if (token) {
-      try {
-        const response = await getPostByIdApi(id)
-        const { status, data } = response
-        if (status === 200) {
-          console.log(data)
-          setPost(data)
-          setIsPostLiked(data?.isLiked)
-        }
-        setIsLoading(false)
-      } catch (error) {
-        console.log(error)
+    if (authLoading) return
+
+    const functionToCall = isAuthenticated
+      ? getPostByIdApi
+      : getPostByIdForGuest
+
+    try {
+      const response = await functionToCall(id)
+      const { status, data } = response
+      if (status === 200) {
+        const { post: postData, profile: profileData } = data
+        setPost(postData)
+        setIsPostLiked(postData?.isLiked)
+        setTags(postData?.tags)
+        setProfile(profileData)
       }
+      setIsLoading(false)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      setIsLoading(false)
     }
   }
 
   async function handleCommentByUser() {
-    if (comment === "") {
-      toast.warning("Comment cannot be empty")
-      return
-    }
-
     if (isAuthenticated) {
+      if (comment === "") {
+        toast.warning("Comment cannot be empty")
+        return
+      }
+
       try {
         const { status } = await commentByUserApi(comment, post.id)
         if (status === 200) {
+          await getPostById()
           toast.success("Comment added")
+
           setComment("")
         }
+        setComment("")
       } catch (error) {
-        console.log(error)
+        toast.error(getErrorMessage(error))
       }
     } else {
-      toast.warning("Login to comment")
+      toast.warning("Sign In Required", {
+        action: {
+          label: "Sign In",
+          onClick: () => navigate("/login"),
+        },
+      })
     }
   }
 
@@ -169,21 +149,34 @@ export default function BlogPostPage() {
   }
 
   async function handleDeleteComment(commentId) {
-    e.preventDefault()
-    if (commentId === null) {
-      toast.error("Could not perform the operation")
-    }
+    if (isAuthenticated) {
+      if (commentId === null && post.id === null) {
+        toast.error("Could not perform the operation")
+        return
+      }
 
-    try {
-      const { status } = await deleteCommentByUserApi(commentId)
-    } catch (error) {
-      console.log(error)
+      try {
+        const { status } = await deleteCommentByUserApi(commentId, post.id)
+        if (status === 200) {
+          toast.info("Comment Deleted!!!")
+          setPost((prev) => ({
+            ...prev,
+            commentList: prev.commentList.filter(
+              (comment) => comment.id !== commentId
+            ),
+          }))
+        }
+      } catch (error) {
+        toast.error(getErrorMessage(error))
+      }
+    } else {
+      toast.warning("Unauthorized Action")
     }
   }
 
   useEffect(() => {
     getPostById()
-  }, [token])
+  }, [isAuthenticated])
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 600)
@@ -192,7 +185,7 @@ export default function BlogPostPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/40">
       <div className="container mx-auto px-4 py-8">
         {!isLoading ? (
           <motion.article
@@ -210,8 +203,130 @@ export default function BlogPostPage() {
                 <CardHeader>
                   <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-gray-500 mb-4">
                     <div className="flex gap-2 items-center">
-                      <User className="h-4 w-4" />
-                      <span>{post?.author}</span>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="p-0 h-fit text-gray-500 align-middle"
+                          >
+                            <User className="h-4 w-4" />
+                            {profile?.username}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Author's Profile</DialogTitle>
+                            <DialogDescription>
+                              You can use this information to contact the author
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="flex flex-col gap-4">
+                            <div className="flex gap-4 bg-muted p-3 rounded-md">
+                              <Avatar className="w-10 h-10 md:w-14 md:h-14 border border-foreground/20 overflow-hidden rounded-full">
+                                <AvatarImage
+                                  src={
+                                    profile?.profilePicture
+                                      ? `${profile.profilePicture}`
+                                      : "/placeholder.svg?height=128&width=128"
+                                  }
+                                  alt="User Avatar"
+                                  className="object-cover w-full h-full"
+                                />
+                                {/* <AvatarImage
+                                  src={
+                                    profile?.profilePicture
+                                      ? `data:image/jpeg;base64,${profile.profilePicture}`
+                                      : "/placeholder.svg?height=128&width=128"
+                                  }
+                                  alt="User Avatar"
+                                  className="object-cover w-full h-full"
+                                /> */}
+                                <AvatarFallback className="text-4xl bg-muted text-muted-foreground">
+                                  {profile?.username?.[0]?.toUpperCase() || "?"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <h3 className="text-lg font-semibold">
+                                  {profile?.username}
+                                </h3>
+                                <p className="text-sm text-muted-foreground flex gap-2 items-center">
+                                  {profile?.email}
+                                  <Copy
+                                    className="w-4 h-4 cursor-pointer focus:outline-none"
+                                    tabIndex={0}
+                                    role="button"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(
+                                        profile?.email
+                                      )
+                                      toast.success("Copied to clipboard")
+                                    }}
+                                  />
+                                </p>
+                              </div>
+                            </div>
+                            {/* <Separator /> */}
+                            {!profile?.github &&
+                            !profile?.twitter &&
+                            !profile.linkedin ? (
+                              ""
+                            ) : (
+                              <div className="w-full grid gap-2">
+                                <h3 className="text-sm font-semibold">
+                                  Social Media Links
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {profile?.github && (
+                                    <a
+                                      href={profile?.github}
+                                      target="_blank"
+                                      className="w-full"
+                                    >
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        className="w-full"
+                                      >
+                                        Github
+                                      </Button>
+                                    </a>
+                                  )}
+                                  {profile?.twitter && (
+                                    <a
+                                      href={profile?.twitter}
+                                      target="_blank"
+                                      className="w-full"
+                                    >
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        className="w-full"
+                                      >
+                                        Twitter
+                                      </Button>
+                                    </a>
+                                  )}
+                                  {profile?.linkedin && (
+                                    <a
+                                      href={profile?.linkedin}
+                                      target="_blank"
+                                      className="w-full"
+                                    >
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        className="w-full"
+                                      >
+                                        Linkedin
+                                      </Button>
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                       <CalendarDays className="h-4 w-4 ml-2" />
                       <span>
                         {format(new Date(post?.createdAt), "dd MMMM yyyy")}
@@ -236,13 +351,25 @@ export default function BlogPostPage() {
                       </Button>
                     </div>
                   </div>
-                  <CardTitle className="text-3xl md:text-4xl mb-4 font-bold underline underline-offset-2 pb-4 border-b">
+                  <CardTitle className="text-3xl md:text-4xl mb-2 font-bold underline underline-offset-2 pb-4">
                     {post.title}
                   </CardTitle>
+                  <div className="flex flex-wrap gap-3">
+                    {tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="outline"
+                        className="text-sm text-muted-foreground hover:bg-muted"
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Separator />
                 </CardHeader>
                 <CardContent>
                   <motion.div
-                    className="prose prose-md max-w-none"
+                    className={`prose prose-md max-w-none dark:prose-invert`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
@@ -263,12 +390,12 @@ export default function BlogPostPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
-                    Comments &lt;{post.commentList.length}&gt;
+                    Comments
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4">
+                  <div className="mb-8 p-4 pt-0 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-2">
                       Add a Comment
                     </h3>
                     <div className="space-y-4">
@@ -278,6 +405,7 @@ export default function BlogPostPage() {
                           placeholder="Share your thoughts..."
                           rows={4}
                           onChange={(e) => setComment(e.target.value)}
+                          value={comment}
                         />
                       </div>
                       <Button onClick={handleCommentByUser}>
@@ -287,14 +415,17 @@ export default function BlogPostPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {post?.commentList?.map((comment) => (
-                      <div>
-                        <div
+                    {post?.commentList?.map((comment, idx) => (
+                      <div key={idx}>
+                        <motion.div
                           key={comment.id}
-                          className="border-l-4 border-blue-200 pl-4 p-2 bg-slate-50 rounded-md rounded-br-none"
+                          className="border-l-4 border-blue-400 pl-4 p-2 rounded-md rounded-br-none bg-muted/50"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.6, duration: 0.4 }}
                         >
                           <div
-                            className={`flex items-center justify-between gap-1 text-sm text-gray-500 mb-2`}
+                            className={`flex items-center justify-between gap-1 text-sm text-gray-500 mb-2 text-primary/80`}
                           >
                             <div
                               className={`flex items-center gap-${
@@ -328,8 +459,7 @@ export default function BlogPostPage() {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                       className="text-red-400 hover:bg-red-200 cursor-pointer"
-                                      onSelect={(e) => {
-                                        e.preventDefault()
+                                      onSelect={() => {
                                         handleDeleteComment(comment?.id)
                                       }}
                                     >
@@ -340,11 +470,13 @@ export default function BlogPostPage() {
                               </div>
                             )}
                           </div>
-                          <p className="text-gray-700">{comment.content}</p>
-                        </div>
+                          <p className="text-gray-700 text-primary">
+                            {comment.content}
+                          </p>
+                        </motion.div>
                         <div className="flex justify-end text-[12px] text-muted-foreground items-center">
-                          <div className="flex text-[12px] text-muted-foreground p-1 gap-2 items-center border border-t-0 bg-slate-50 rounded-bl-md rounded-br-md">
-                            <CalendarDays className="h-4 w-4 ml-2" />
+                          <div className="flex text-[12px] text-muted-foreground p-1 px-3 gap-2 items-center rounded-bl-md rounded-br-md bg-muted/50">
+                            <CalendarDays className="h-4 w-4" />
                             <span>
                               {format(
                                 new Date(comment?.createAt),
@@ -365,7 +497,7 @@ export default function BlogPostPage() {
             </motion.div>
           </motion.article>
         ) : (
-          <div>Is loading</div>
+          <BarsLoader />
         )}
       </div>
     </div>

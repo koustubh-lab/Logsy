@@ -59,28 +59,53 @@ export function AuthContextProvider({ children }) {
   }
 
   useEffect(() => {
-    const existingToken = localStorage.getItem("token")
-    if (!existingToken) {
-      setToken(null)
+    const validateToken = async () => {
+      const existingToken = localStorage.getItem("token")
+      if (!existingToken) {
+        setToken(null)
+        setIsAuthenticated(false)
+        setLoading(false)
+        return
+      }
+
+      try {
+        const { exp } = jwtDecode(existingToken)
+        if (Date.now() < exp * 1000) {
+          applyInterceptor(existingToken)
+          setToken(existingToken)
+
+          try {
+            const res = await apiClient.get("/api/validate-login-token")
+
+            if (res.status === 200) {
+              setIsAuthenticated(true)
+            } else {
+              throw new Error("Token invalid on server")
+            }
+          } catch (err) {
+            console.error("Backend validation failed:", err)
+            localStorage.removeItem("token")
+            setToken(null)
+            setIsAuthenticated(false)
+          }
+        } else {
+          localStorage.removeItem("token")
+          console.log("Token expired")
+          setIsAuthenticated(false)
+
+          await apiClient.get("/api/wake-up")
+        }
+      } catch (error) {
+        console.log("Error decoding token:", error)
+        localStorage.removeItem("token")
+        setToken(null)
+        setIsAuthenticated(false)
+      }
+
       setLoading(false)
-      return
     }
 
-    try {
-      const { exp } = jwtDecode(existingToken)
-      if (Date.now() < exp * 1000) {
-        applyInterceptor(existingToken)
-        setIsAuthenticated(true)
-        setToken(existingToken)
-      } else {
-        localStorage.removeItem("token")
-        console.log("token expired")
-      }
-    } catch (error) {
-      localStorage.removeItem("token")
-      console.log("error in token decoding")
-    }
-    setLoading(false)
+    validateToken()
   }, [])
 
   return (

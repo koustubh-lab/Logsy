@@ -1,13 +1,10 @@
 package com.spring.blog_application.service;
 
-import com.spring.blog_application.model.Post;
 import com.spring.blog_application.model.Profile;
 import com.spring.blog_application.model.User;
 import com.spring.blog_application.repository.UserRepository;
 import com.spring.blog_application.utils.RegisterRequest;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,14 +21,18 @@ public class UserService {
 
     public void registerUser(RegisterRequest request) {
         try {
+            Profile profile = new Profile();
             User user = User.builder()
                     .username(request.username())
                     .email(request.email())
                     .createdAt(LocalDate.now())
                     .posts(new ArrayList<>())
-                    .profile(new Profile())
+                    .profile(profile)
                     .enabled(false)
                     .build();
+            profile.setUser(user);
+            profile.setEmail(request.email());
+            profile.setUsername(request.username());
             userRepository.save(user);
         } catch (Exception e) {
             log.info("Error: {}", e.getMessage());
@@ -52,5 +53,9 @@ public class UserService {
         User user = userRepository.findByEmail(email);
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

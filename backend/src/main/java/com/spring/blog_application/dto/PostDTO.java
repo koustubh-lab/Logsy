@@ -11,5 +11,6 @@ public record PostDTO(
         LocalDateTime createdAt,
         String author,
         List<CommentDTO> commentList,
+        List<String> tags,
         boolean isLiked
 ) {}

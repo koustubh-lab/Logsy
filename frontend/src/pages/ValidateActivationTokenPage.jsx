@@ -29,6 +29,7 @@ export default function ValidateActivationTokenPage() {
             label: "Go to Login Page",
             onClick: () => navigate("/login", { replace: true }),
           },
+          duration: 10000,
         })
       }
     } catch (error) {
@@ -52,7 +53,7 @@ export default function ValidateActivationTokenPage() {
           <FancySuccessComponent />
           <div>
             <h1 className="font-bold text-2xl">Validation Complete</h1>
-            <p className="text-muted-foreground">Redirecting...</p>
+            <p className="text-muted-foreground">Account Activated</p>
           </div>
         </div>
       ) : (

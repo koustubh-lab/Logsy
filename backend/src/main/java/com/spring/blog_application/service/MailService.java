@@ -26,7 +26,7 @@ public class MailService {
         headers.setBearerAuth(apiKey);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("from", "onboarding@resend.dev"); // Use onresend.com or your verified domain
+        body.put("from", "Logsy@logsy.site"); // Use onresend.com or your verified domain
         body.put("to", List.of(to));
         body.put("subject", subject);
         body.put("html", htmlContent);

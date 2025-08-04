@@ -1,5 +1,4 @@
 import useAuth from "@/context/AuthContext"
-import { Circle, Frown } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { Button } from "./ui/button"
@@ -95,18 +94,24 @@ export default function SideSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent>
-        <SheetHeader className={"bg-slate-800 p-2 rounded-md"}>
+        <SheetHeader className={"bg-muted p-2 rounded-md"}>
           <SheetTitle>
-            <div className="flex gap-2 items-center p-2">
-              <img src="/logsy.svg" alt="Logsy" className="h-14 w-1h-14 " />
-              <h1 className="text-3xl md:text-5xl text-white">Logsy</h1>
+            <div className="flex gap-2 items-center p-2 bg-muted">
+              <div className="h-16 w-16 grid place-content-center justify-center bg-black rounded-full p-[1px]">
+                <img
+                  src="/logsy-new-logo-compressed.png"
+                  alt="Logsy"
+                  className="h-full w-full"
+                />
+              </div>
+              <h1 className="text-3xl md:text-5xl text-foreground">Logsy</h1>
             </div>
           </SheetTitle>
-          <SheetDescription className="text-muted">
+          <SheetDescription className="text-foreground/70">
             Select any of the options below to change current tab
           </SheetDescription>
         </SheetHeader>
-        <div className="grid gap-2 mt-5">
+        <div className="grid gap-1 mt-5">
           {tabOptions.map((tab) => (
             <div key={tab}>
               {tab === "logout" && <Separator className="my-2" />}
@@ -127,9 +132,6 @@ export default function SideSheet() {
                         You will have to login-in again to access your account
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="grid place-content-center p-4">
-                      <Frown />
-                    </div>
                     <DialogFooter>
                       <DialogClose>
                         <Button variant="secondary">Cancel</Button>
@@ -148,7 +150,7 @@ export default function SideSheet() {
                   variant="ghost"
                   asChild
                   className={`justify-start capitalize w-full ${
-                    location.pathname.endsWith(tab) ? "bg-slate-100" : ""
+                    location.pathname.endsWith(tab) ? "bg-muted" : ""
                   }`}
                 >
                   <Link
@@ -156,9 +158,9 @@ export default function SideSheet() {
                     className="flex justify-between items-center w-full group"
                   >
                     {tab}
-                    {location.pathname.endsWith(tab) && (
-                      <Circle fill="#334155" className={"h-5 w-5"} />
-                    )}
+                    {/* {location.pathname.endsWith(tab) && (
+                      <Circle fill="#212121" className={"h-5 w-5"} />
+                    )} */}
                   </Link>
                 </Button>
               )}

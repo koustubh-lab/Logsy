@@ -1,6 +1,20 @@
 package com.spring.blog_application.dto;
 
-import com.spring.blog_application.model.Post;
+import java.time.LocalDate;
+import java.util.Base64;
+import java.util.List;
 
-public record ProfileDTO(Post post, String author, boolean isPostLiked) {
+public record ProfileDTO(
+        Integer userId,
+        String username,
+        String email,
+        List<String> professions,
+        String bio,
+        String location,
+        String profilePicture,
+        String github,
+        String linkedin,
+        String twitter,
+        LocalDate date
+) {
 }

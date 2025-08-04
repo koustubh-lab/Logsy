@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import useAuth from "@/context/AuthContext"
 import { motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 const containerVariants = {
@@ -42,7 +43,17 @@ const itemVariants = {
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [errors, setErrors] = useState({ email: "" })
+  const [loading, setLoading] = useState(false)
   const inputRef = useRef(null)
+
+  const { isAuthenticated, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate("/home/dashboard")
+    }
+  }, [isAuthenticated, authLoading])
 
   const validateForm = () => {
     const newErrors = { email: "" }
@@ -62,7 +73,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
+
     if (!validateForm()) {
+      setLoading(false)
       return
     }
 
@@ -79,7 +93,15 @@ export default function LoginPage() {
         })
       }
     } catch (error) {
-      toast.error(error.message)
+      if (error.response) {
+        toast.error(error.response.data)
+      } else if (error.request) {
+        toast.error("Ensure that you have a stable internet connection")
+      } else {
+        toast.error("Server error")
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -88,14 +110,14 @@ export default function LoginPage() {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 p-4 appear-animation">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 appear-animation">
       <motion.div
         className="max-w-md mx-auto w-full"
         variants={containerVariants}
         initial="hidden"
         animate="show"
       >
-        <Card className="border-none shadow-2xl backdrop-blur-sm">
+        <Card className="border-none shadow-none sm:shadow-2xl backdrop-blur-sm">
           <CardHeader className="space-y-1">
             <motion.div variants={itemVariants}>
               <CardTitle className="text-3xl font-bold text-center">
@@ -128,8 +150,13 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <motion.div variants={itemVariants} className="w-full">
-                <Button type="submit" className="w-full">
-                  Login
+                <Button
+                  type="submit"
+                  className={`w-full ${
+                    loading ? "pointer-events-none opacity-50" : ""
+                  }`}
+                >
+                  {loading ? "Please wait..." : "Send Login Mail"}
                 </Button>
               </motion.div>
               <motion.div

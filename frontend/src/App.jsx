@@ -1,9 +1,12 @@
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useEffect } from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import BarsLoader from "./components/BarLoader"
 import EditPostPage from "./pages/EditPage"
+import PrivacyPage from "./pages/PrivacyPolicyPage"
 import ProtectedRoute from "./pages/ProtectedRoute"
 import ValidateActivationTokenPage from "./pages/ValidateActivationTokenPage"
+import { applyThemeBasedOnTime } from "./utils/ThemeUtils"
+import TermsOfServicePage from "./pages/TermsOfServicePage"
 
 const LandingPage = lazy(() => import("./pages/LandingPage"))
 const LoginPage = lazy(() => import("./pages/LoginPage"))
@@ -53,6 +56,7 @@ function App() {
         { path: "dashboard", element: <DashboardPage /> },
         { path: "profile", element: <ProfilePage /> },
         { path: "explore", element: <ExplorePage /> },
+        { path: "explore/:topic", element: <ExplorePage /> },
         { path: "create-post", element: <CreatePostPage /> },
         { path: "edit/:id", element: <EditPostPage /> },
       ],
@@ -62,14 +66,25 @@ function App() {
       element: <BlogPostPage />,
     },
     {
-      path: "/home/edit/:id",
-      element: <EditPostPage />,
+      path: "/privacy-policy",
+      element: <PrivacyPage />,
+    },
+    {
+      path: "/terms-and-conditions",
+      element: <TermsOfServicePage />,
     },
     {
       path: "*",
       element: <InvalidRoutePage />,
     },
   ])
+
+  useEffect(() => {
+    applyThemeBasedOnTime()
+    const interval = setInterval(applyThemeBasedOnTime, 10 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <Suspense fallback={<BarsLoader />}>
       <RouterProvider router={router} />

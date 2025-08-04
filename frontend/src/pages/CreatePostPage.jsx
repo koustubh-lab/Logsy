@@ -1,8 +1,10 @@
 import { createBlogForUserApi } from "@/api/PostApiService"
+import FullSizeLoader from "@/components/FullSizeLoader"
 import { MultiSelectCombobox } from "@/components/MultiValueSelectComponent"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { options } from "@/utils/TagOptions"
 import { motion } from "framer-motion"
 import hljs from "highlight.js"
 import { useState } from "react"
@@ -43,45 +45,12 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 }
 
-const options = [
-  { label: "JavaScript", value: "javascript" },
-  { label: "React", value: "react" },
-  { label: "Vue", value: "vue" },
-  { label: "Svelte", value: "svelte" },
-  { label: "Angular", value: "angular" },
-  { label: "Next.js", value: "nextjs" },
-  { label: "Node.js", value: "nodejs" },
-  { label: "Express", value: "express" },
-  { label: "MongoDB", value: "mongodb" },
-  { label: "SQL", value: "sql" },
-  { label: "Python", value: "python" },
-  { label: "Django", value: "django" },
-  { label: "Flask", value: "flask" },
-  { label: "Java", value: "java" },
-  { label: "Spring Boot", value: "springboot" },
-  { label: "HTML", value: "html" },
-  { label: "CSS", value: "css" },
-  { label: "Tailwind CSS", value: "tailwind" },
-  { label: "Bootstrap", value: "bootstrap" },
-  { label: "Web Development", value: "webdev" },
-  { label: "Frontend", value: "frontend" },
-  { label: "Backend", value: "backend" },
-  { label: "Full Stack", value: "fullstack" },
-  { label: "DevOps", value: "devops" },
-  { label: "Git", value: "git" },
-  { label: "GitHub", value: "github" },
-  { label: "Linux", value: "linux" },
-  { label: "Testing", value: "testing" },
-  { label: "VS Code", value: "vscode" },
-  { label: "Tips & Tricks", value: "tips" },
-  { label: "Career", value: "career" },
-]
-
 export default function CreatePostPage() {
   const [content, setContent] = useState("")
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [selectedValues, setSelectedValues] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
 
@@ -95,8 +64,14 @@ export default function CreatePostPage() {
       toast.error("Filling every field is important for posting a blog")
     }
 
+    setLoading(true)
     try {
-      const { status } = await createBlogForUserApi(title, content, description, selectedValues)
+      const { status } = await createBlogForUserApi(
+        title,
+        content,
+        description,
+        selectedValues
+      )
       if (status === 200) {
         toast.success("Congratulations!!!", {
           description: "Post created successfully",
@@ -115,6 +90,8 @@ export default function CreatePostPage() {
       } else {
         toast.error("Server error")
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -125,6 +102,7 @@ export default function CreatePostPage() {
       animate="show"
       className="max-w-4xl mx-auto mt-10 p-4 grid gap-5"
     >
+      {loading && <FullSizeLoader />}
       <motion.h1
         variants={fadeUp}
         className="font-semibold text-2xl sm:text-3xl capitalize"
@@ -139,9 +117,9 @@ export default function CreatePostPage() {
         <Input
           id="post-title"
           name="post-title"
-          className="text-sm sm:text-base"
+          className="text-sm sm:text-base text-primary"
           placeholder="Ex. Getting started with React and Typescript"
-          maxLength={70}
+          maxLength={100}
           onChange={handleTitleChange}
           value={title}
         />
@@ -154,10 +132,11 @@ export default function CreatePostPage() {
         <Input
           id="post-title"
           name="post-title"
-          className="text-sm sm:text-base"
+          className="text-sm sm:text-base text-primary"
           placeholder="Ex. This post is about this and that"
           onChange={handleDescriptionChange}
-          value={title}
+          value={description}
+          maxLength={200}
         />
       </motion.div>
 
@@ -178,9 +157,9 @@ export default function CreatePostPage() {
         <div>
           <ReactQuill
             value={content}
+            placeholder="Start typing from here"
             onChange={handleChange}
             modules={modules}
-            theme="snow"
           />
         </div>
       </motion.div>

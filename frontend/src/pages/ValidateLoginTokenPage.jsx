@@ -2,8 +2,10 @@ import BarsLoader from "@/components/BarLoader"
 import FancyFailureComponent from "@/components/FancyFailureComponent"
 import FancySuccessComponent from "@/components/FancySuccessComponent"
 import useAuth from "@/context/AuthContext"
+import { getErrorMessage } from "@/utils/AxoisErrorHandler"
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import { toast } from "sonner"
 
 export default function ValidateLoginTokenPage() {
   const [searchParams] = useSearchParams()
@@ -25,11 +27,13 @@ export default function ValidateLoginTokenPage() {
         setLoading(false)
         setIsAuthenticated(true)
         setTimeout(() => {
-          navigate("/home/dashboard", { replace: true })
+          navigate("/home/explore", { replace: true })
         }, 2000)
       }
     } catch (error) {
-      console.log(error)
+      toast.error(getErrorMessage(error))
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -55,6 +59,9 @@ export default function ValidateLoginTokenPage() {
           <FancyFailureComponent />
           <div>
             <h1 className="font-bold text-2xl">Login Failed</h1>
+            <p className="text-muted-foreground">
+              Maybe because your Login link is either expired or invalid
+            </p>
           </div>
         </div>
       )}

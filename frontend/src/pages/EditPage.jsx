@@ -1,7 +1,11 @@
 import { getPostByIdApi, updateBlogByPostIdApi } from "@/api/PostApiService"
+import FullSizeLoader from "@/components/FullSizeLoader"
+import { MultiSelectCombobox } from "@/components/MultiValueSelectComponent"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { getErrorMessage } from "@/utils/AxoisErrorHandler"
+import { options } from "@/utils/TagOptions"
 import { motion } from "framer-motion"
 import hljs from "highlight.js"
 import { useEffect, useState } from "react"
@@ -45,6 +49,9 @@ const fadeUp = {
 export default function EditPostPage() {
   const [content, setContent] = useState("")
   const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [selectedValues, setSelectedValues] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const { id } = useParams()
   const navigate = useNavigate()
@@ -53,6 +60,7 @@ export default function EditPostPage() {
     setTitle(e.target.value)
   }
 
+  const handleDescriptionChange = (e) => setDescription(e.target.value)
   const handleChange = (value) => setContent(value)
 
   const handleSubmit = async () => {
@@ -61,6 +69,7 @@ export default function EditPostPage() {
       return
     }
 
+    setLoading(true)
     try {
       const { status } = await updateBlogByPostIdApi(id, title, content)
       if (status === 200) {
@@ -79,19 +88,27 @@ export default function EditPostPage() {
       } else {
         toast.error("Server error")
       }
+    } finally {
+      setLoading(false)
     }
   }
 
   async function getPostById() {
+    setLoading(true)
     try {
       const response = await getPostByIdApi(id)
       const { status, data } = response
       if (status === 200) {
-        setTitle(data.title)
-        setContent(data.content)
+        const { post } = data
+        setTitle(post.title)
+        setContent(post.content)
+        setSelectedValues(post.tags)
+        setDescription(post.description)
       }
     } catch (error) {
-      console.log(error)
+      toast.error(getErrorMessage(error))
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -106,6 +123,7 @@ export default function EditPostPage() {
       animate="show"
       className="max-w-4xl mx-auto mt-10 p-4 grid gap-5"
     >
+      {loading && <FullSizeLoader />}
       <motion.h1
         variants={fadeUp}
         className="font-semibold text-2xl sm:text-3xl capitalize"
@@ -125,6 +143,32 @@ export default function EditPostPage() {
           maxLength={70}
           onChange={handleTitleChange}
           value={title}
+        />
+      </motion.div>
+
+      <motion.div variants={fadeUp} className="grid gap-2">
+        <Label htmlFor="post-title" className="capitalize font-bold">
+          post description{" "}
+        </Label>
+        <Input
+          id="post-title"
+          name="post-title"
+          className="text-sm sm:text-base text-primary"
+          placeholder="Ex. This post is about this and that"
+          onChange={handleDescriptionChange}
+          value={description}
+        />
+      </motion.div>
+
+      <motion.div variants={fadeUp} className="grid gap-2">
+        <Label htmlFor="post-title" className="capitalize font-bold">
+          post tags{" "}
+        </Label>
+        <MultiSelectCombobox
+          selectedValues={selectedValues}
+          setSelectedValues={setSelectedValues}
+          options={options}
+          placeholder="Select tags for blog"
         />
       </motion.div>
 

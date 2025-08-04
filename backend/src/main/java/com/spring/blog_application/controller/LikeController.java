@@ -23,4 +23,10 @@ public class LikeController {
         likeService.likePostByUser(request, authentication.getName());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/post/unlike")
+    public ResponseEntity<Void> unlikeAPostByUser(@RequestBody LikeRequest request, Authentication authentication) {
+        likeService.unlikePostByUser(request, authentication.getName());
+        return ResponseEntity.ok().build();
+    }
 }

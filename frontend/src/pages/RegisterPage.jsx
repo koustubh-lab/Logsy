@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import useAuth from "@/context/AuthContext"
 import { Filter } from "bad-words"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
@@ -45,9 +45,17 @@ const itemVariants = {
 export default function RegisterPage() {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
   const { register } = useAuth()
   const filter = new Filter()
+
+  const { isAuthenticated, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate("/home/dashboard")
+    }
+  }, [isAuthenticated, authLoading])
 
   const [formData, setFormData] = useState({
     username: "",
@@ -124,14 +132,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/40 via-white to-muted/50 grid place-content-center px-4">
+    <div className="min-h-screen grid place-content-center bg-muted/40">
       <motion.div
         className="max-w-md w-full"
         variants={containerVariants}
         initial="hidden"
         animate="show"
       >
-        <Card className="border-none shadow-2xl backdrop-blur-sm">
+        <Card className="border-none shadow-none sm:shadow-2xl sm:backdrop-blur-sm">
           <CardHeader className="text-center space-y-1">
             <motion.div variants={itemVariants}>
               <CardTitle className="text-3xl font-bold tracking-tight">
@@ -193,11 +201,11 @@ export default function RegisterPage() {
                 />
                 <Label htmlFor="terms" className="text-sm leading-snug">
                   I agree to the{" "}
-                  <Link to="/terms" className="text-blue-600 underline">
+                  <Link to="/terms-and-conditions" className="text-blue-600 underline">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link to="/privacy" className="text-blue-600 underline">
+                  <Link to="/privacy-policy" className="text-blue-600 underline">
                     Privacy Policy
                   </Link>
                 </Label>
@@ -209,7 +217,7 @@ export default function RegisterPage() {
                   className="w-full"
                   disabled={!termsAccepted || isLoading}
                 >
-                  {isLoading ? "Processing..." : "Create Account"}
+                  {isLoading ? "Processing..." : "Send Verification Email"}
                 </Button>
               </motion.div>
             </form>
