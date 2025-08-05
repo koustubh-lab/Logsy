@@ -180,7 +180,7 @@ export default function ViewAllPostDialog({ deletePost }) {
               </div>
             )}
             {!hasMore && !isLoading && data.posts.length > 0 && (
-              <div className="text-center text-sm py-1 text-gray-700 bg-foreground/10 rounded-full">
+              <div className="text-center text-sm py-1 text-muted-foreground bg-foreground/10 rounded-full">
                 No more posts to load.
               </div>
             )}

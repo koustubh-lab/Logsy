@@ -317,7 +317,7 @@ export default function ProfilePage() {
           </p>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="mt-2 w-full">
+              <Button variant="default" size="sm" className="mt-2 w-full">
                 Edit Personal Details
               </Button>
             </DialogTrigger>

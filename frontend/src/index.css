@@ -86,6 +86,24 @@ pre.ql-syntax {
   scrollbar-width: none;
 }
 
+/* ! Edited by me for React Quill */
+.ql-toolbar.ql-snow {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+  background-color: #fff !important;
+}
+
+.ql-container.ql-snow {
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+  background-color: #fff !important;
+  color: black !important;
+}
+
+pre.ql-syntax {
+  background-color: #303030 !important;
+  scrollbar-width: none;
+}
 
 
 @layer base {
