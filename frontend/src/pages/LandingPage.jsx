@@ -329,7 +329,7 @@ export default function LandingPage() {
           </div>
           <div className="mx-auto grid justify-items-center max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
             <motion.img
-              src="/about-us-section-image.png"
+              src="/about-us-section-image.webp"
               width={550}
               height={310}
               alt="Person writing on a laptop"

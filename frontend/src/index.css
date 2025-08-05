@@ -29,7 +29,7 @@ pre.ql-syntax {
 }
 
 .custom-landing-page-background-image {
-  background-image: url("/logsy-new-background-2.png");
+  background-image: url("/logsy-new-background-2.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -69,19 +69,6 @@ pre.ql-syntax {
   scrollbar-width: none;
 }
 
-
-/* input:-webkit-autofill {
-  box-shadow: 0 0 0px 1000px transparent inset !important;
-  -webkit-text-fill-color: white !important;
-  transition: background-color 9999s ease-in-out 0s;
-}
-
-.dark input:-webkit-autofill {
-  box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
-  -webkit-text-fill-color: white !important;
-  transition: background-color 9999s ease-in-out 0s;
-} */
-
 .unscrollable {
   scrollbar-width: none;
 }
@@ -104,7 +91,6 @@ pre.ql-syntax {
   background-color: #303030 !important;
   scrollbar-width: none;
 }
-
 
 @layer base {
   :root {
