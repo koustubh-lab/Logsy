@@ -77,7 +77,6 @@ export default function ProfilePage() {
       const response = await getProfileApi()
       const { status, data } = response
       if (status === 200) {
-        console.log(data)
         setProfileData(data)
         setSelectedValues(data?.professions)
 
@@ -100,7 +99,7 @@ export default function ProfilePage() {
         })
       }
     } catch (error) {
-      console.log(error)
+      toast.error(getErrorMessage(error))
     } finally {
       setLoading(false)
     }

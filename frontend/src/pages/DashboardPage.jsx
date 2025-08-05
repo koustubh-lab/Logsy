@@ -54,7 +54,7 @@ export default function DashboardPage() {
           setIsLoading(false)
         }, 0)
       } catch (error) {
-        console.log(error)
+        toast.error(getErrorMessage(error))
       } finally {
         setIsLoading(false)
       }

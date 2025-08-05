@@ -118,7 +118,7 @@ export default function ExplorePage() {
         setIsEndReached(data.length < POST_TO_LOAD)
       }
     } catch (error) {
-      console.log(error)
+      toast.error(getErrorMessage(error))
     } finally {
       setLoading(false)
     }

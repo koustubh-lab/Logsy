@@ -128,7 +128,6 @@ export default function LandingPage() {
       const response = await getAllPostsForUserByPageApi(0, 6)
       const { status, data } = response
       if (status === 200) {
-        console.log(data)
         setBlogPosts(data)
       }
     } catch (error) {
@@ -136,14 +135,64 @@ export default function LandingPage() {
     }
   }
 
+  const areContactFieldsValid = () => {
+    const { name, email, subject, message } = contactFormData
+
+    if (!name.trim()) {
+      toast.error("Name is required")
+      return false
+    }
+
+    if (name.length < 3) {
+      toast.error("Name must be at least 3 characters long")
+      return false
+    }
+
+    if (!email.trim()) {
+      toast.error("Email is required")
+      return false
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error("Invalid email format")
+      return false
+    }
+
+    if (!subject.trim()) {
+      toast.error("Subject is required")
+      return false
+    }
+
+    if (subject.length < 5) {
+      toast.error("Subject must be at least 5 characters long")
+      return false
+    }
+
+    if (!message.trim()) {
+      toast.error("Message is required")
+      return false
+    }
+
+    if (message.length < 10) {
+      toast.error("Message must be at least 10 characters long")
+      return false
+    }
+
+    return true
+  }
+
   const handleContactFormSubmit = async () => {
+    if (!areContactFieldsValid()) {
+      return
+    }
     setLoading(true)
 
     try {
       const response = await sendContactRequestApi(contactFormData)
-      const { status } = response
+      const { status, data } = response
       if (status === 200) {
-        toast.success("Message sent successfully")
+        toast.success(data?.message || "Message sent successfully")
         setContactFormData({
           name: "",
           email: "",
@@ -492,7 +541,7 @@ export default function LandingPage() {
                 onChange={handleContactFormChange}
               />
               <Button
-                type="submit"
+                type="button"
                 onClick={handleContactFormSubmit}
                 className={loading ? "pointer-events-none opacity-50" : ""}
               >
