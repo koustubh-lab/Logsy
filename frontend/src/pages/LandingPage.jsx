@@ -449,7 +449,7 @@ export default function LandingPage() {
 
       {blogPosts && blogPosts?.length > 0 && (
         <section
-          className="container mx-auto px-4 py-16 bg-background text-foreground"
+          className="min-h-screen container mx-auto px-4 py-16 bg-background text-foreground"
           id="explore-posts"
         >
           <motion.h2
@@ -518,6 +518,7 @@ export default function LandingPage() {
                 type="text"
                 name="name"
                 className="bg-muted/5"
+                value={contactFormData.name}
                 onChange={handleContactFormChange}
               />
               <Input
@@ -525,6 +526,7 @@ export default function LandingPage() {
                 type="email"
                 name="email"
                 className="bg-muted/5"
+                value={contactFormData.email}
                 onChange={handleContactFormChange}
               />
               <Input
@@ -532,12 +534,14 @@ export default function LandingPage() {
                 type="text"
                 className="bg-muted/5"
                 name="subject"
+                value={contactFormData.subject}
                 onChange={handleContactFormChange}
               />
               <textarea
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-muted/5 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Your Message"
                 name="message"
+                value={contactFormData.message}
                 onChange={handleContactFormChange}
               />
               <Button
