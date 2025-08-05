@@ -45,7 +45,8 @@ public class SecurityConfiguration {
                                 "/api/request-account-registration",
                                 "/api/validate-login-magic-link",
                                 "/api/validate-activation-magic-link",
-                                "/api/global-posts"
+                                "/api/global-posts",
+                                "/api/contact-admin"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                         .anyRequest().authenticated()
