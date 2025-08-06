@@ -28,7 +28,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import useAuth from "@/context/AuthContext"
 import { getErrorMessage } from "@/utils/AxoisErrorHandler"
-import { format, parseISO } from "date-fns"
+import { format, isValid, parseISO } from "date-fns"
 import { motion } from "framer-motion"
 import { debounce } from "lodash"
 import {
