@@ -329,7 +329,7 @@ export default function BlogPostPage() {
                       </Dialog>
                       <CalendarDays className="h-4 w-4 ml-2" />
                       <span>
-                        {format(new Date(post?.createdAt), "dd MMMM yyyy")}
+                        {format(new Date(post?.createdAt), "M/d/yyyy")}
                       </span>
                     </div>
                     <div>
