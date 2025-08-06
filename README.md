@@ -2,8 +2,6 @@
 
 **Logsy** is a modern, full-stack blogging platform built with Java Spring Boot and React. It features magic link authentication, rich content creation, and smooth user experience powered by Supabase and Resend.
 
-![Logsy Banner](https://via.placeholder.com/1200x400?text=Logsy+Blogging+Platform)
-
 ---
 
 ## 🚀 Features
