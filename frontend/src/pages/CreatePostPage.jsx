@@ -136,7 +136,7 @@ export default function CreatePostPage() {
           placeholder="Ex. This post is about this and that"
           onChange={handleDescriptionChange}
           value={description}
-          maxLength={200}
+          maxLength={400}
         />
       </motion.div>
 
