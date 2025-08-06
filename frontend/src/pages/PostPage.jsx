@@ -261,10 +261,10 @@ export default function BlogPostPage() {
 
                             {profile?.professions && (
                               <div>
-                                <h3 className="text-sm font-semibold">
+                                <h3 className="text-sm font-semibold md:text-base">
                                   Professions
                                 </h3>
-                                <p className="text-muted-foreground">
+                                <p className="text-muted-foreground text-sm md:text-base">
                                   {profile?.professions?.join(", ")}
                                 </p>
                               </div>
@@ -272,8 +272,10 @@ export default function BlogPostPage() {
 
                             {profile?.bio && (
                               <div>
-                                <h3 className="text-sm font-semibold">Bio</h3>
-                                <p className="text-muted-foreground">
+                                <h3 className="text-sm font-semibold md:text-base">
+                                  Bio
+                                </h3>
+                                <p className="text-muted-foreground text-sm md:text-base">
                                   {profile?.bio}
                                 </p>
                               </div>
