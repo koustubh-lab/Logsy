@@ -186,7 +186,7 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-muted/40">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto sm:px-4 sm:py-8">
         {!isLoading ? (
           <motion.article
             className="max-w-4xl mx-auto"
@@ -199,7 +199,7 @@ export default function BlogPostPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Card className="mb-8">
+              <Card className="mb-8 rounded-none sm:rounded-md">
                 <CardHeader>
                   <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-gray-500 mb-4">
                     <div className="flex gap-2 items-center">
@@ -386,7 +386,7 @@ export default function BlogPostPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.4 }}
             >
-              <Card>
+              <Card className="rounded-none sm:rounded-md">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
