@@ -13,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -36,7 +38,7 @@ public class CommentService {
             throw new EntityNotFoundException("User with email: " + email + " was not found");
         }
 
-        Comment comment = new Comment(null, request.comment(), LocalDateTime.now(), post, user);
+        Comment comment = new Comment(null, request.comment(), OffsetDateTime.now(ZoneOffset.UTC), post, user);
         post.getComments().add(comment);
         commentRepository.save(comment);
     }

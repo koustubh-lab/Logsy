@@ -34,7 +34,7 @@ import { getErrorMessage } from "@/utils/AxoisErrorHandler"
 import { professionOptions } from "@/utils/TagOptions"
 import { Dialog } from "@radix-ui/react-dialog"
 import { Label } from "@radix-ui/react-dropdown-menu"
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { motion } from "framer-motion"
 import { debounce } from "lodash"
 import { PencilIcon } from "lucide-react"
@@ -312,7 +312,7 @@ export default function ProfilePage() {
             Joined on:{" "}
             <span className="font-semibold">
               {personalDetails?.createdAt &&
-                format(new Date(personalDetails?.createdAt), "dd MMMM yyyy")}
+                format(parseISO(personalDetails?.createdAt), "dd MMMM yyyy")}
             </span>
           </p>
           <Dialog>

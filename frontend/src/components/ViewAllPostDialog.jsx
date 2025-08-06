@@ -1,6 +1,6 @@
 import { getPostsForUserByPageWithDashboardDetailsApi } from "@/api/PostApiService"
 import useAuth from "@/context/AuthContext"
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { motion } from "framer-motion"
 import { CalendarDays, Edit, Eye, MessageSquare, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
@@ -108,7 +108,8 @@ export default function ViewAllPostDialog({ deletePost }) {
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <CalendarDays className="h-4 w-4" />
-                      {format(new Date(post.createdAt), "dd MMMM yyyy")}
+                      {post?.createdAt &&
+                        format(parseISO(post.createdAt), "dd MMMM yyyy")}
                     </div>
                     <span className="flex items-center gap-1">
                       <MessageSquare className="h-4 w-4" />

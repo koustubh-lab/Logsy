@@ -28,13 +28,14 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import useAuth from "@/context/AuthContext"
 import { getErrorMessage } from "@/utils/AxoisErrorHandler"
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { motion } from "framer-motion"
 import { debounce } from "lodash"
 import {
   CalendarDays,
   Clock,
   Copy,
+  ExternalLink,
   Heart,
   MessageSquare,
   MoreHorizontal,
@@ -213,7 +214,7 @@ export default function BlogPostPage() {
                             {profile?.username}
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="w-[800px] max-w-full">
                           <DialogHeader>
                             <DialogTitle>Author's Profile</DialogTitle>
                             <DialogDescription>
@@ -221,7 +222,7 @@ export default function BlogPostPage() {
                             </DialogDescription>
                           </DialogHeader>
                           <div className="flex flex-col gap-4">
-                            <div className="flex gap-4 bg-muted p-3 rounded-md">
+                            <div className="flex items-center gap-4 border p-3 rounded-md">
                               <Avatar className="w-10 h-10 md:w-14 md:h-14 border border-foreground/20 overflow-hidden rounded-full">
                                 <AvatarImage
                                   src={
@@ -232,19 +233,11 @@ export default function BlogPostPage() {
                                   alt="User Avatar"
                                   className="object-cover w-full h-full"
                                 />
-                                {/* <AvatarImage
-                                  src={
-                                    profile?.profilePicture
-                                      ? `data:image/jpeg;base64,${profile.profilePicture}`
-                                      : "/placeholder.svg?height=128&width=128"
-                                  }
-                                  alt="User Avatar"
-                                  className="object-cover w-full h-full"
-                                /> */}
                                 <AvatarFallback className="text-4xl bg-muted text-muted-foreground">
                                   {profile?.username?.[0]?.toUpperCase() || "?"}
                                 </AvatarFallback>
                               </Avatar>
+
                               <div>
                                 <h3 className="text-lg font-semibold">
                                   {profile?.username}
@@ -265,17 +258,35 @@ export default function BlogPostPage() {
                                 </p>
                               </div>
                             </div>
-                            {/* <Separator /> */}
+
+                            {profile?.professions && (
+                              <div>
+                                <h3>Professions</h3>
+                                <p className="text-muted-foreground">
+                                  {profile?.professions?.join(", ")}
+                                </p>
+                              </div>
+                            )}
+
+                            {profile?.bio && (
+                              <div>
+                                <h3>Bio</h3>
+                                <p className="text-muted-foreground">
+                                  {profile?.bio}
+                                </p>
+                              </div>
+                            )}
+
                             {!profile?.github &&
                             !profile?.twitter &&
-                            !profile.linkedin ? (
+                            !profile?.linkedin ? (
                               ""
                             ) : (
                               <div className="w-full grid gap-2">
                                 <h3 className="text-sm font-semibold">
                                   Social Media Links
                                 </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                   {profile?.github && (
                                     <a
                                       href={profile?.github}
@@ -287,7 +298,7 @@ export default function BlogPostPage() {
                                         variant="secondary"
                                         className="w-full"
                                       >
-                                        Github
+                                        Github <ExternalLink />
                                       </Button>
                                     </a>
                                   )}
@@ -302,7 +313,7 @@ export default function BlogPostPage() {
                                         variant="secondary"
                                         className="w-full"
                                       >
-                                        Twitter
+                                        Twitter <ExternalLink />
                                       </Button>
                                     </a>
                                   )}
@@ -317,7 +328,7 @@ export default function BlogPostPage() {
                                         variant="secondary"
                                         className="w-full"
                                       >
-                                        Linkedin
+                                        Linkedin <ExternalLink />
                                       </Button>
                                     </a>
                                   )}
@@ -329,7 +340,8 @@ export default function BlogPostPage() {
                       </Dialog>
                       <CalendarDays className="h-4 w-4 ml-2" />
                       <span>
-                        {format(new Date(post?.createdAt), "M/d/yyyy")}
+                        {post?.createdAt &&
+                          format(parseISO(post.createdAt), "M/d/yyyy")}
                       </span>
                     </div>
                     <div>
@@ -351,7 +363,7 @@ export default function BlogPostPage() {
                       </Button>
                     </div>
                   </div>
-                  <CardTitle className="text-3xl md:text-4xl mb-2 font-bold underline underline-offset-2 pb-4">
+                  <CardTitle className="text-2xl sm:text-3xl md:text-4xl mb-2 font-bold underline underline-offset-2 pb-4">
                     {post.title}
                   </CardTitle>
                   <div className="flex flex-wrap gap-3">
@@ -478,14 +490,20 @@ export default function BlogPostPage() {
                           <div className="flex text-[12px] text-muted-foreground p-1 px-3 gap-2 items-center rounded-bl-md rounded-br-md bg-muted/50">
                             <CalendarDays className="h-4 w-4" />
                             <span>
-                              {format(
-                                new Date(comment?.createAt),
-                                "dd MMMM yyyy"
-                              )}
+                              {comment?.createAt &&
+                              isValid(parseISO(comment.createAt))
+                                ? format(
+                                    parseISO(comment.createAt),
+                                    "dd MMMM yyyy"
+                                  )
+                                : "Invalid date"}
                             </span>
                             <Clock className="h-4 w-4" />
                             <span>
-                              {format(new Date(comment?.createAt), "hh:mm")}
+                              {comment?.createAt &&
+                              isValid(parseISO(comment.createAt))
+                                ? format(parseISO(comment.createAt), "hh:mm a")
+                                : "--:--"}
                             </span>
                           </div>
                         </div>

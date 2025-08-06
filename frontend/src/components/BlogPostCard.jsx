@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import BlogPostPage from "@/pages/PostPage"
+import { format, parseISO } from "date-fns"
 import { CalendarDays, User } from "lucide-react"
 import { useRef, useState } from "react"
 import { Link } from "react-router-dom"
@@ -61,7 +62,7 @@ export function BlogPostCard({
             <User className="h-4 w-4" />
             <span>{author}</span>
             <CalendarDays className="h-4 w-4 ml-2" />
-            <span>{BlogPostPage}</span>
+            <span>{format(parseISO(createdAt), "M/d/yyyy")}</span>
           </div>
           <CardTitle className="line-clamp-2 hover:text-blue-600 transition-colors leading-normal">
             <Link to={`/post/${id}`}>{title}</Link>

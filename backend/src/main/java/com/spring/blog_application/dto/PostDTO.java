@@ -1,6 +1,7 @@
 package com.spring.blog_application.dto;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public record PostDTO(
@@ -8,7 +9,7 @@ public record PostDTO(
         String title,
         String description,
         String content,
-        LocalDateTime createdAt,
+        OffsetDateTime createdAt,
         String author,
         List<CommentDTO> commentList,
         List<String> tags,

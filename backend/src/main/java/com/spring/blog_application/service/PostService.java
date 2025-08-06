@@ -15,7 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class PostService {
                 .title(request.title())
                 .description(request.description())
                 .content(request.content())
-                .createdAt(LocalDateTime.now())
+                .createdAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .user(existingUser)
                 .comments(new ArrayList<>())
                 .likes(new ArrayList<>())
