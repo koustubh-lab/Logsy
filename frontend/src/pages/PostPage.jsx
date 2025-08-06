@@ -222,7 +222,7 @@ export default function BlogPostPage() {
                             </DialogDescription>
                           </DialogHeader>
                           <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-4 border p-3 rounded-md">
+                            <div className="flex items-center gap-4 border bg-muted/50 p-3 rounded-md">
                               <Avatar className="w-10 h-10 md:w-14 md:h-14 border border-foreground/20 overflow-hidden rounded-full">
                                 <AvatarImage
                                   src={
@@ -261,7 +261,9 @@ export default function BlogPostPage() {
 
                             {profile?.professions && (
                               <div>
-                                <h3>Professions</h3>
+                                <h3 className="text-sm font-semibold">
+                                  Professions
+                                </h3>
                                 <p className="text-muted-foreground">
                                   {profile?.professions?.join(", ")}
                                 </p>
@@ -270,7 +272,7 @@ export default function BlogPostPage() {
 
                             {profile?.bio && (
                               <div>
-                                <h3>Bio</h3>
+                                <h3 className="text-sm font-semibold">Bio</h3>
                                 <p className="text-muted-foreground">
                                   {profile?.bio}
                                 </p>
