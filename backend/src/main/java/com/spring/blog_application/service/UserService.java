@@ -4,6 +4,7 @@ import com.spring.blog_application.model.Profile;
 import com.spring.blog_application.model.User;
 import com.spring.blog_application.repository.UserRepository;
 import com.spring.blog_application.utils.RegisterRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,14 @@ public class UserService {
     public boolean doesUserNotExist(String email) {
         User user = userRepository.findByEmail(email);
         return user == null;
+    }
+
+    public boolean isUserAccountActivated(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new EntityNotFoundException("User with email: " + email + " was not found");
+        }
+        return user.isEnabled();
     }
 
     public void activateUserAccount(String email) {
