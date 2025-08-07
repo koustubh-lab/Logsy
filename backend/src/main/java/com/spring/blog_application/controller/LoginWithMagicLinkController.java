@@ -48,7 +48,7 @@ public class LoginWithMagicLinkController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email: " + request.email() + " was not found");
             }
 
-            if (userService.isUserAccountActivated(request.email())) {
+            if (!userService.isUserAccountActivated(request.email())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User's account is not activated");
             }
 
