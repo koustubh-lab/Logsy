@@ -20,6 +20,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./ui/sheet"
+import { ChevronLeft } from "lucide-react"
 
 const OPEN_DELAY = 1000
 
@@ -92,82 +93,94 @@ export default function SideSheet() {
   }, [location.pathname])
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent>
-        <SheetHeader className={"bg-muted p-2 rounded-md"}>
-          <SheetTitle>
-            <div className="flex gap-2 items-center p-2 bg-muted">
-              <div className="h-16 w-16 grid place-content-center justify-center bg-black rounded-full p-[1px]">
-                <img
-                  src="/logsy-new-logo-compressed.png"
-                  alt="Logsy"
-                  className="h-full w-full"
-                />
+    <>
+      <Button
+        variant="outline"
+        onClick={() => setIsOpen(true)}
+        className={`fixed top-1/2 right-0 z-50 -translate-y-1/2 p-2 rounded-l-md shadow-lg transition-transform duration-200 hover:translate-x-0 ${
+          isOpen ? "translate-x-full opacity-0 pointer-events-none" : ""
+        }`}
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </Button>
+
+      <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+        <SheetContent>
+          <SheetHeader className={"bg-muted p-2 rounded-md"}>
+            <SheetTitle>
+              <div className="flex gap-2 items-center p-2 bg-muted">
+                <div className="h-16 w-16 grid place-content-center justify-center bg-black rounded-full p-[1px]">
+                  <img
+                    src="/logsy-new-logo-compressed.png"
+                    alt="Logsy"
+                    className="h-full w-full"
+                  />
+                </div>
+                <h1 className="text-3xl md:text-5xl text-foreground">Logsy</h1>
               </div>
-              <h1 className="text-3xl md:text-5xl text-foreground">Logsy</h1>
-            </div>
-          </SheetTitle>
-          <SheetDescription className="text-foreground/70">
-            Select any of the options below to change current tab
-          </SheetDescription>
-        </SheetHeader>
-        <div className="grid gap-1 mt-5">
-          {tabOptions.map((tab) => (
-            <div key={tab}>
-              {tab === "logout" && <Separator className="my-2" />}
-              {tab === "logout" ? (
-                <Dialog>
-                  <DialogTrigger className="w-full" asChild>
-                    <Button
-                      variant="ghost"
-                      className={`justify-start capitalize w-full text-red-500 hover:text-red-500 hover:bg-red-200 duration-200`}
+            </SheetTitle>
+            <SheetDescription className="text-foreground/70">
+              Select any of the options below to change current tab
+            </SheetDescription>
+          </SheetHeader>
+          <div className="grid gap-1 mt-5">
+            {tabOptions.map((tab) => (
+              <div key={tab}>
+                {tab === "logout" && <Separator className="my-2" />}
+                {tab === "logout" ? (
+                  <Dialog>
+                    <DialogTrigger className="w-full" asChild>
+                      <Button
+                        variant="ghost"
+                        className={`justify-start capitalize w-full text-red-500 hover:text-red-500 hover:bg-red-200 duration-200`}
+                      >
+                        {tab}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Logout?</DialogTitle>
+                        <DialogDescription>
+                          You will have to login-in again to access your account
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <DialogClose>
+                          <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                        <Button
+                          variant="destructive"
+                          onClick={handleLogoutAction}
+                        >
+                          Logout
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    asChild
+                    className={`justify-start capitalize w-full ${
+                      location.pathname.endsWith(tab) ? "bg-muted" : ""
+                    }`}
+                  >
+                    <Link
+                      to={`/home/${tab}`}
+                      className="flex justify-between items-center w-full group"
                     >
                       {tab}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Logout?</DialogTitle>
-                      <DialogDescription>
-                        You will have to login-in again to access your account
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <DialogClose>
-                        <Button variant="secondary">Cancel</Button>
-                      </DialogClose>
-                      <Button
-                        variant="destructive"
-                        onClick={handleLogoutAction}
-                      >
-                        Logout
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              ) : (
-                <Button
-                  variant="ghost"
-                  asChild
-                  className={`justify-start capitalize w-full ${
-                    location.pathname.endsWith(tab) ? "bg-muted" : ""
-                  }`}
-                >
-                  <Link
-                    to={`/home/${tab}`}
-                    className="flex justify-between items-center w-full group"
-                  >
-                    {tab}
-                    {/* {location.pathname.endsWith(tab) && (
+                      {/* {location.pathname.endsWith(tab) && (
                       <Circle fill="#212121" className={"h-5 w-5"} />
                     )} */}
-                  </Link>
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      </SheetContent>
-    </Sheet>
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   )
 }
